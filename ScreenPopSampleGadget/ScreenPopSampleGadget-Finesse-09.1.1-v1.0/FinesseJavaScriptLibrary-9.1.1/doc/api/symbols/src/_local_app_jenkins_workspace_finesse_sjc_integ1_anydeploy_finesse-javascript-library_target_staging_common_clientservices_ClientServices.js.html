@@ -1,0 +1,906 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview Exposes a set of API wrappers that will hide the dirty work of
+<span class='line'>  3</span>  *     constructing Finesse API requests and consuming Finesse events.
+<span class='line'>  4</span>  *
+<span class='line'>  5</span>  * @name finesse.clientservices.ClientServices
+<span class='line'>  6</span>  * @requires OpenAjax, jQuery 1.5, finesse.utilities.Utilities
+<span class='line'>  7</span>  */</span><span class="WHIT">
+<span class='line'>  8</span> 
+<span class='line'>  9</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 10</span> </span><span class="NAME">finesse.version</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'$version$'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 11</span> </span><span class="NAME">finesse.clientservices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.clientservices</span><span class="WHIT">  </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="COMM">/**
+<span class='line'> 13</span>  * @class
+<span class='line'> 14</span>  * Allow clients to make Finesse API requests and consume Finesse events by
+<span class='line'> 15</span>  * calling a set of exposed functions. The Services layer will do the dirty
+<span class='line'> 16</span>  * work of establishing a shared BOSH connection (for designated Master
+<span class='line'> 17</span>  * modules), consuming events for client subscriptions, and constructing API
+<span class='line'> 18</span>  * requests.
+<span class='line'> 19</span>  */</span><span class="WHIT">
+<span class='line'> 20</span> </span><span class="NAME">finesse.clientservices.ClientServices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 21</span> 
+<span class='line'> 22</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT">
+<span class='line'> 23</span> 
+<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 25</span>      * Shortcut reference to the master tunnel
+<span class='line'> 26</span>      * @private
+<span class='line'> 27</span>      */</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">_tunnel</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 29</span> 
+<span class='line'> 30</span> </span><span class="WHIT">    </span><span class="NAME">_publisher</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 31</span> 
+<span class='line'> 32</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 33</span>      * Shortcut reference to the finesse.utilities.Utilities singleton
+<span class='line'> 34</span>      * This will be set by init()
+<span class='line'> 35</span>      * @private
+<span class='line'> 36</span>      */</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">    </span><span class="NAME">_util</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 38</span> 
+<span class='line'> 39</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 40</span>      * Shortcut reference to the gadgets.io object.
+<span class='line'> 41</span>      * This will be set by init()
+<span class='line'> 42</span>      * @private
+<span class='line'> 43</span>      */</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">    </span><span class="NAME">_io</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 45</span> 
+<span class='line'> 46</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 47</span>      * Shortcut reference to the gadget pubsub Hub instance.
+<span class='line'> 48</span>      * This will be set by init()
+<span class='line'> 49</span>      * @private
+<span class='line'> 50</span>      */</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">    </span><span class="NAME">_hub</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 52</span> 
+<span class='line'> 53</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 54</span>      * Logger object set externally by setLogger, defaults to nothing.
+<span class='line'> 55</span>      * @private
+<span class='line'> 56</span>      */</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">	</span><span class="NAME">_logger</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 58</span> 
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 60</span>      * Shortcut reference to the Topics class.
+<span class='line'> 61</span>      * This will be set by init()
+<span class='line'> 62</span>      * @private
+<span class='line'> 63</span>      */</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="NAME">_topics</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 65</span> 
+<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 67</span>      * Config object needed to initialize this library
+<span class='line'> 68</span>      * This must be set by init()
+<span class='line'> 69</span>      * @private
+<span class='line'> 70</span>      */</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="NAME">_config</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 72</span> 
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 74</span>      * @private
+<span class='line'> 75</span>      * Whether or not this ClientService instance is a Master.
+<span class='line'> 76</span>      */</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">    </span><span class="NAME">_isMaster</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 78</span> 
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 80</span>      * @private
+<span class='line'> 81</span>      * Whether the Client Services have been initiated yet.
+<span class='line'> 82</span>      */</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">    </span><span class="NAME">_inited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 84</span> 
+<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 86</span>      * Stores the list of subscription IDs for all subscriptions so that it
+<span class='line'> 87</span>      * could be retrieve for unsubscriptions.
+<span class='line'> 88</span>      * @private
+<span class='line'> 89</span>      */</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="NAME">_subscriptionID</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 91</span> 
+<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 93</span>      * The possible states of the JabberWerx BOSH connection.
+<span class='line'> 94</span>      * @private
+<span class='line'> 95</span>      */</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="NAME">_STATUS</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">        </span><span class="NAME">CONNECTING</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"connecting"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">        </span><span class="NAME">CONNECTED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"connected"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">        </span><span class="NAME">DISCONNECTED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"disconnected"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">        </span><span class="NAME">DISCONNECTED_CONFLICT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"conflict"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">        </span><span class="NAME">DISCONNECTED_UNAUTHORIZED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"unauthorized"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">        </span><span class="NAME">DISCONNECTING</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"disconnecting"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">        </span><span class="NAME">RECONNECTING</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"reconnecting"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">        </span><span class="NAME">UNLOADING</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"unloading"</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>106</span> 
+<span class='line'>107</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>108</span>      * Handler function to be invoked when BOSH connection is connecting.
+<span class='line'>109</span>      * @private
+<span class='line'>110</span>      */</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">    </span><span class="NAME">_onConnectingHandler</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>112</span> 
+<span class='line'>113</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>114</span>      * Handler function to be invoked when BOSH connection is connected
+<span class='line'>115</span>      * @private
+<span class='line'>116</span>      */</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">    </span><span class="NAME">_onConnectHandler</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>118</span> 
+<span class='line'>119</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>120</span>      * Handler function to be invoked when BOSH connection is disconnecting.
+<span class='line'>121</span>      * @private
+<span class='line'>122</span>      */</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">    </span><span class="NAME">_onDisconnectingHandler</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>124</span> 
+<span class='line'>125</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>126</span>      * Handler function to be invoked when the BOSH is disconnected.
+<span class='line'>127</span>      * @private
+<span class='line'>128</span>      */</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">    </span><span class="NAME">_onDisconnectHandler</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>130</span> 
+<span class='line'>131</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>132</span>      * Handler function to be invoked when the BOSH is reconnecting.
+<span class='line'>133</span>      * @private
+<span class='line'>134</span>      */</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">    </span><span class="NAME">_onReconnectingHandler</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>138</span>      * Handler function to be invoked when the BOSH is unloading.
+<span class='line'>139</span>      * @private
+<span class='line'>140</span>      */</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">    </span><span class="NAME">_onUnloadingHandler</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>142</span> 
+<span class='line'>143</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>144</span>      * Contains a cache of the latest connection info containing the current
+<span class='line'>145</span>      * state of the BOSH connection and the resource ID.
+<span class='line'>146</span>      * @private
+<span class='line'>147</span>      */</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">    </span><span class="NAME">_connInfo</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>149</span> 
+<span class='line'>150</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>151</span>      * Keeps track of all the objects that need to be refreshed when we recover
+<span class='line'>152</span>      * due to our resilient connection. Only objects that we subscribe to will
+<span class='line'>153</span>      * be added to this list.
+<span class='line'>154</span>      */</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">    </span><span class="NAME">_refreshList</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>156</span> 
+<span class='line'>157</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>158</span>      * @private
+<span class='line'>159</span>      * Centralized logger.log method for external logger
+<span class='line'>160</span>      * @param {String} msg
+<span class='line'>161</span>      *     Message to log
+<span class='line'>162</span>      */</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">	</span><span class="NAME">_log</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">		</span><span class="COMM">// If the external logger throws up, it stops here.</span><span class="WHIT">
+<span class='line'>165</span> </span><span class="WHIT">		</span><span class="KEYW">try</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_logger.log</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="WHIT">				</span><span class="NAME">_logger.log</span><span class="PUNC">(</span><span class="STRN">"[ClientServices] "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">catch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>171</span> 
+<span class='line'>172</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>173</span>      * Go through each object in the _refreshList and call its refresh() function
+<span class='line'>174</span>      */</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="WHIT">    </span><span class="NAME">_refreshObjects</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>177</span> 
+<span class='line'>178</span> </span><span class="WHIT">        </span><span class="COMM">// wipe out the explicit subscription list before we refresh objects</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_publisher</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">            </span><span class="NAME">_publisher.wipeout</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>182</span> 
+<span class='line'>183</span> </span><span class="WHIT">        </span><span class="COMM">// refresh each item in the refresh list</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_refreshList.length</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">>=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="WHIT">            </span><span class="NAME">_log</span><span class="PUNC">(</span><span class="STRN">"Refreshing "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_refreshList</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">            </span><span class="NAME">_refreshList</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">refresh</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>189</span> 
+<span class='line'>190</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>191</span>      * Handler to process connection info publishes.
+<span class='line'>192</span>      * @param {Object} data
+<span class='line'>193</span>      *     The connection info data object.
+<span class='line'>194</span>      * @param {String} data.status
+<span class='line'>195</span>      *     The BOSH connection status.
+<span class='line'>196</span>      * @param {String} data.resourceID
+<span class='line'>197</span>      *     The resource ID for the connection.
+<span class='line'>198</span>      * @private
+<span class='line'>199</span>      */</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">    </span><span class="NAME">_connInfoHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>201</span> 
+<span class='line'>202</span> </span><span class="WHIT">        </span><span class="COMM">//Invoke registered handler depending on status received. Due to the</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">        </span><span class="COMM">//request topic where clients can make request for the Master to publish</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">        </span><span class="COMM">//the connection info, there is a chance that duplicate connection info</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">        </span><span class="COMM">//events may be sent, so ensure that there has been a state change</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="WHIT">        </span><span class="COMM">//before invoking the handlers.</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_connInfo</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">_connInfo.status</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">data.status</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">            </span><span class="NAME">_connInfo</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">            </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">data.status</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.CONNECTING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onConnectingHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="WHIT">                    </span><span class="NAME">_onConnectingHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.CONNECTED</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>216</span> </span><span class="WHIT">                </span><span class="COMM">// Whenever we are connected, we need to refresh any objects</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">                </span><span class="COMM">// that are stored.</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">                </span><span class="NAME">_refreshObjects</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onConnectHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">                    </span><span class="NAME">_onConnectHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>221</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>222</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>223</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.DISCONNECTED</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onDisconnectHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">                    </span><span class="NAME">_onDisconnectHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>226</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>227</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>228</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.DISCONNECTED_CONFLICT</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>229</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onDisconnectHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">                    </span><span class="NAME">_onDisconnectHandler</span><span class="PUNC">(</span><span class="STRN">"conflict"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>232</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>233</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.DISCONNECTED_UNAUTHORIZED</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>234</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onDisconnectHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>235</span> </span><span class="WHIT">                    </span><span class="NAME">_onDisconnectHandler</span><span class="PUNC">(</span><span class="STRN">"unauthorized"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>237</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.DISCONNECTING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onDisconnectingHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">                    </span><span class="NAME">_onDisconnectingHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>242</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.RECONNECTING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>244</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onReconnectingHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">                    </span><span class="NAME">_onReconnectingHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>246</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>247</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>248</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.UNLOADING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>249</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_onUnloadingHandler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>250</span> </span><span class="WHIT">                    </span><span class="NAME">_onUnloadingHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>251</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>252</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>253</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>254</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>255</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>256</span> 
+<span class='line'>257</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>258</span>      * Ensure that ClientServices have been inited.
+<span class='line'>259</span>      * @private
+<span class='line'>260</span>      */</span><span class="WHIT">
+<span class='line'>261</span> </span><span class="WHIT">    </span><span class="NAME">_isInited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>262</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_inited</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>263</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"ClientServices needs to be inited."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>266</span> 
+<span class='line'>267</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>268</span>      * Have the client become the Master by initiating a tunnel to a shared
+<span class='line'>269</span>      * event BOSH connection. The Master is responsible for publishing all
+<span class='line'>270</span>      * events to the pubsub infrastructure.
+<span class='line'>271</span>      * @private
+<span class='line'>272</span>      */</span><span class="WHIT">
+<span class='line'>273</span> </span><span class="WHIT">    </span><span class="NAME">_becomeMaster</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>274</span> </span><span class="WHIT">        </span><span class="NAME">_tunnel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.clientservices.MasterTunnel</span><span class="PUNC">(</span><span class="NAME">_config.host</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_config.scheme</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">        </span><span class="NAME">_publisher</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.clientservices.MasterPublisher</span><span class="PUNC">(</span><span class="NAME">_tunnel</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">        </span><span class="NAME">_tunnel.init</span><span class="PUNC">(</span><span class="NAME">_config.id</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_config.password</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_config.xmppDomain</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_config.pubsubDomain</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_config.resource</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>277</span> </span><span class="WHIT">        </span><span class="NAME">_isMaster</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>279</span> 
+<span class='line'>280</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>281</span>      * Make a request to the request channel to have the Master publish the
+<span class='line'>282</span>      * connection info object.
+<span class='line'>283</span>      * @private
+<span class='line'>284</span>      */</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="WHIT">    </span><span class="NAME">_makeConnectionInfoReq</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">            </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ConnectionInfoReq"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="WHIT">            </span><span class="NAME">data</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="WHIT">            </span><span class="NAME">invokeID</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="WHIT">        </span><span class="NAME">_hub.publish</span><span class="PUNC">(</span><span class="NAME">_topics.REQUESTS</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>293</span> 
+<span class='line'>294</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>295</span>      * Utility method to register a handler which is associated with a
+<span class='line'>296</span>      * particular connection status.
+<span class='line'>297</span>      * @param {String} status
+<span class='line'>298</span>      *     The connection status string.
+<span class='line'>299</span>      * @param {Function} handler
+<span class='line'>300</span>      *     The handler to associate with a particular connection status.
+<span class='line'>301</span>      * @throws {Error}
+<span class='line'>302</span>      *     If the handler provided is not a function.
+<span class='line'>303</span>      * @private
+<span class='line'>304</span>      */</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="WHIT">    </span><span class="NAME">_registerHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">status</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_connInfo</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">_connInfo.status</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">status</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="WHIT">                </span><span class="NAME">handler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="WHIT">            </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">status</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>311</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.CONNECTING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>312</span> </span><span class="WHIT">                </span><span class="NAME">_onConnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>313</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>314</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.CONNECTED</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="WHIT">                </span><span class="NAME">_onConnectHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>316</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>317</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.DISCONNECTED</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>318</span> </span><span class="WHIT">                </span><span class="NAME">_onDisconnectHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>319</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>320</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.DISCONNECTING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>321</span> </span><span class="WHIT">                </span><span class="NAME">_onDisconnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.RECONNECTING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">                </span><span class="NAME">_onReconnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">            </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">_STATUS.UNLOADING</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>327</span> </span><span class="WHIT">                </span><span class="NAME">_onUnloadingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>328</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>329</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>330</span> 
+<span class='line'>331</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"Callback is not a function"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>333</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>334</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>335</span> 
+<span class='line'>336</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>337</span> 
+<span class='line'>338</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>339</span>          * Adds an item to the list to be refreshed upon reconnect
+<span class='line'>340</span>          * @param {RestBase} object - rest object to be refreshed
+<span class='line'>341</span>          */</span><span class="WHIT">
+<span class='line'>342</span> </span><span class="WHIT">        </span><span class="NAME">addToRefreshList</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">            </span><span class="NAME">_refreshList.push</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>345</span> 
+<span class='line'>346</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>347</span>          * Removes the given item from the refresh list
+<span class='line'>348</span>          * @param  {RestBase} object - rest object to be removed
+<span class='line'>349</span>          */</span><span class="WHIT">
+<span class='line'>350</span> </span><span class="WHIT">        </span><span class="NAME">removeFromRefreshList</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>351</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>352</span> </span><span class="WHIT">            </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_refreshList.length</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">>=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>353</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_refreshList</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>354</span> </span><span class="WHIT">                    </span><span class="NAME">_refreshList.splice</span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>355</span> </span><span class="WHIT">                    </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>356</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>357</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>358</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>359</span> 
+<span class='line'>360</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>361</span>          * The location of the tunnel HTML URL.
+<span class='line'>362</span>          * @returns {String}
+<span class='line'>363</span>          *     The location of the tunnel HTML URL.
+<span class='line'>364</span>          */</span><span class="WHIT">
+<span class='line'>365</span> </span><span class="WHIT">        </span><span class="NAME">getTunnelURL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>366</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_tunnel.getTunnelURL</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">            </span><span class="WHIT">
+<span class='line'>367</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>368</span> </span><span class="WHIT">        </span><span class="WHIT">
+<span class='line'>369</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>370</span>          * @private
+<span class='line'>371</span>          * Indicates whether the tunnel frame is loaded.
+<span class='line'>372</span>          * @returns {Boolean}
+<span class='line'>373</span>          *     True if the tunnel frame is loaded, false otherwise.
+<span class='line'>374</span>          */</span><span class="WHIT">
+<span class='line'>375</span> </span><span class="WHIT">        </span><span class="NAME">isTunnelLoaded</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>376</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_tunnel.isTunnelLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">            </span><span class="WHIT">
+<span class='line'>377</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>378</span> </span><span class="WHIT">        </span><span class="WHIT">
+<span class='line'>379</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>380</span>          * @private
+<span class='line'>381</span>          * Indicates whether the ClientServices instance is a Master.
+<span class='line'>382</span>          * @returns {Boolean}
+<span class='line'>383</span>          *     True if this instance of ClientServices is a Master, false otherwise.
+<span class='line'>384</span>          */</span><span class="WHIT">
+<span class='line'>385</span> </span><span class="WHIT">        </span><span class="NAME">isMaster</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>386</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_isMaster</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>387</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>388</span> 
+<span class='line'>389</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>390</span>          * @private
+<span class='line'>391</span>          * Get the resource ID. An ID is only available if the BOSH connection has
+<span class='line'>392</span>          * been able to connect successfully.
+<span class='line'>393</span>          * @returns {String}
+<span class='line'>394</span>          *     The resource ID string. Null if the BOSH connection was never
+<span class='line'>395</span>          *     successfully created and/or the resource ID has not been associated.
+<span class='line'>396</span>          */</span><span class="WHIT">
+<span class='line'>397</span> </span><span class="WHIT">        </span><span class="NAME">getResourceID</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>398</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_connInfo</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>399</span> </span><span class="WHIT">                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_connInfo.resourceID</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>400</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>401</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>402</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>403</span> </span><span class="WHIT">		</span><span class="WHIT">
+<span class='line'>404</span> </span><span class="WHIT">		</span><span class="COMM">/*
+<span class='line'>405</span> 		getHub: function () {
+<span class='line'>406</span> 			return _hub;
+<span class='line'>407</span> 		},
+<span class='line'>408</span> 	*/</span><span class="WHIT">
+<span class='line'>409</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>410</span>          * @private
+<span class='line'>411</span>          * Add a callback to be invoked when the BOSH connection is attempting
+<span class='line'>412</span>          * to connect. If the connection is already trying to connect, the
+<span class='line'>413</span>          * callback will be invoked immediately.
+<span class='line'>414</span>          * @param {Function} handler
+<span class='line'>415</span>          *      An empty param function to be invoked on connecting. Only one
+<span class='line'>416</span>          *      handler can be registered at a time. Handlers already registered
+<span class='line'>417</span>          *      will be overwritten.
+<span class='line'>418</span>          */</span><span class="WHIT">
+<span class='line'>419</span> </span><span class="WHIT">        </span><span class="NAME">registerOnConnectingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>420</span> </span><span class="WHIT">            </span><span class="NAME">_registerHandler</span><span class="PUNC">(</span><span class="NAME">_STATUS.CONNECTING</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>421</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>422</span> 
+<span class='line'>423</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>424</span>          * @private
+<span class='line'>425</span>          * Removes the on connecting callback that was registered.
+<span class='line'>426</span>          */</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">        </span><span class="NAME">unregisterOnConnectingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="WHIT">            </span><span class="NAME">_onConnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>430</span> 
+<span class='line'>431</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>432</span>          * @private
+<span class='line'>433</span>          * Add a callback to be invoked when the BOSH connection has been
+<span class='line'>434</span>          * established. If the connection has already been established, the
+<span class='line'>435</span>          * callback will be invoked immediately.
+<span class='line'>436</span>          * @param {Function} handler
+<span class='line'>437</span>          *      An empty param function to be invoked on connect. Only one handler
+<span class='line'>438</span>          *      can be registered at a time. Handlers already registered will be
+<span class='line'>439</span>          *      overwritten.
+<span class='line'>440</span>          */</span><span class="WHIT">
+<span class='line'>441</span> </span><span class="WHIT">        </span><span class="NAME">registerOnConnectHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>442</span> </span><span class="WHIT">            </span><span class="NAME">_registerHandler</span><span class="PUNC">(</span><span class="NAME">_STATUS.CONNECTED</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>443</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>444</span> 
+<span class='line'>445</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>446</span>          * @private
+<span class='line'>447</span>          * Removes the on connect callback that was registered.
+<span class='line'>448</span>          */</span><span class="WHIT">
+<span class='line'>449</span> </span><span class="WHIT">        </span><span class="NAME">unregisterOnConnectHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>450</span> </span><span class="WHIT">            </span><span class="NAME">_onConnectHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>451</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>452</span> 
+<span class='line'>453</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>454</span>          * @private
+<span class='line'>455</span>          * Add a callback to be invoked when the BOSH connection goes down. If
+<span class='line'>456</span>          * the connection is already down, invoke the callback immediately.
+<span class='line'>457</span>          * @param {Function} handler
+<span class='line'>458</span>          *      An empty param function to be invoked on disconnected. Only one
+<span class='line'>459</span>          *      handler can be registered at a time. Handlers already registered
+<span class='line'>460</span>          *      will be overwritten.
+<span class='line'>461</span>          */</span><span class="WHIT">
+<span class='line'>462</span> </span><span class="WHIT">        </span><span class="NAME">registerOnDisconnectHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>463</span> </span><span class="WHIT">            </span><span class="NAME">_registerHandler</span><span class="PUNC">(</span><span class="NAME">_STATUS.DISCONNECTED</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>464</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>465</span> 
+<span class='line'>466</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>467</span>          * @private
+<span class='line'>468</span>          * Removes the on disconnect callback that was registered.
+<span class='line'>469</span>          */</span><span class="WHIT">
+<span class='line'>470</span> </span><span class="WHIT">        </span><span class="NAME">unregisterOnDisconnectHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>471</span> </span><span class="WHIT">            </span><span class="NAME">_onDisconnectHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>472</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>473</span> 
+<span class='line'>474</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>475</span>          * @private
+<span class='line'>476</span>          * Add a callback to be invoked when the BOSH is currently disconnecting. If
+<span class='line'>477</span>          * the connection is already disconnecting, invoke the callback immediately.
+<span class='line'>478</span>          * @param {Function} handler
+<span class='line'>479</span>          *      An empty param function to be invoked on disconnected. Only one
+<span class='line'>480</span>          *      handler can be registered at a time. Handlers already registered
+<span class='line'>481</span>          *      will be overwritten.
+<span class='line'>482</span>          */</span><span class="WHIT">
+<span class='line'>483</span> </span><span class="WHIT">        </span><span class="NAME">registerOnDisconnectingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>484</span> </span><span class="WHIT">            </span><span class="NAME">_registerHandler</span><span class="PUNC">(</span><span class="NAME">_STATUS.DISCONNECTING</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>485</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>486</span> 
+<span class='line'>487</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>488</span>          * @private
+<span class='line'>489</span>          * Removes the on disconnecting callback that was registered.
+<span class='line'>490</span>          */</span><span class="WHIT">
+<span class='line'>491</span> </span><span class="WHIT">        </span><span class="NAME">unregisterOnDisconnectingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>492</span> </span><span class="WHIT">            </span><span class="NAME">_onDisconnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>493</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>494</span> 
+<span class='line'>495</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>496</span>          * @private
+<span class='line'>497</span>          * Add a callback to be invoked when the BOSH connection is attempting
+<span class='line'>498</span>          * to connect. If the connection is already trying to connect, the
+<span class='line'>499</span>          * callback will be invoked immediately.
+<span class='line'>500</span>          * @param {Function} handler
+<span class='line'>501</span>          *      An empty param function to be invoked on connecting. Only one
+<span class='line'>502</span>          *      handler can be registered at a time. Handlers already registered
+<span class='line'>503</span>          *      will be overwritten.
+<span class='line'>504</span>          */</span><span class="WHIT">
+<span class='line'>505</span> </span><span class="WHIT">        </span><span class="NAME">registerOnReconnectingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>506</span> </span><span class="WHIT">            </span><span class="NAME">_registerHandler</span><span class="PUNC">(</span><span class="NAME">_STATUS.RECONNECTING</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>507</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>508</span> 
+<span class='line'>509</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>510</span>          * @private
+<span class='line'>511</span>          * Removes the on reconnecting callback that was registered.
+<span class='line'>512</span>          */</span><span class="WHIT">
+<span class='line'>513</span> </span><span class="WHIT">        </span><span class="NAME">unregisterOnReconnectingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>514</span> </span><span class="WHIT">            </span><span class="NAME">_onReconnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>515</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>516</span> </span><span class="WHIT">        </span><span class="WHIT">
+<span class='line'>517</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>518</span>          * @private
+<span class='line'>519</span>          * Add a callback to be invoked when the BOSH connection is unloading
+<span class='line'>520</span>          * 
+<span class='line'>521</span>          * @param {Function} handler
+<span class='line'>522</span>          *      An empty param function to be invoked on connecting. Only one
+<span class='line'>523</span>          *      handler can be registered at a time. Handlers already registered
+<span class='line'>524</span>          *      will be overwritten.
+<span class='line'>525</span>          */</span><span class="WHIT">
+<span class='line'>526</span> </span><span class="WHIT">        </span><span class="NAME">registerOnUnloadingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>527</span> </span><span class="WHIT">            </span><span class="NAME">_registerHandler</span><span class="PUNC">(</span><span class="NAME">_STATUS.UNLOADING</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>528</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>529</span> </span><span class="WHIT">        </span><span class="WHIT">
+<span class='line'>530</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>531</span>          * @private
+<span class='line'>532</span>          * Removes the on unloading callback that was registered.
+<span class='line'>533</span>          */</span><span class="WHIT">
+<span class='line'>534</span> </span><span class="WHIT">        </span><span class="NAME">unregisterOnUnloadingHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>535</span> </span><span class="WHIT">            </span><span class="NAME">_onUnloadingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>536</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>537</span> 
+<span class='line'>538</span> </span><span class="WHIT">	    </span><span class="COMM">/**
+<span class='line'>539</span>          * @private
+<span class='line'>540</span> 	     * Proxy method for gadgets.io.makeRequest. The will be identical to gadgets.io.makeRequest
+<span class='line'>541</span>          * ClientServices will mixin the BASIC Auth string, locale, and host, since the
+<span class='line'>542</span>          * configuration is encapsulated in here anyways.
+<span class='line'>543</span>          * This removes the dependency
+<span class='line'>544</span> 	     * @param {String} url
+<span class='line'>545</span> 	     *     The relative url to make the request to (the host from the passed in config will be
+<span class='line'>546</span>          *     appended). It is expected that any encoding to the URL is already done.
+<span class='line'>547</span> 	     * @param {Function} handler
+<span class='line'>548</span> 	     *     Callback handler for makeRequest to invoke when the response returns.
+<span class='line'>549</span>          *     Completely passed through to gadgets.io.makeRequest
+<span class='line'>550</span> 	     * @param {Object} params
+<span class='line'>551</span> 	     *     The params object that gadgets.io.makeRequest expects. Authorization and locale
+<span class='line'>552</span> 	     *     headers are mixed in.
+<span class='line'>553</span>          */</span><span class="WHIT">
+<span class='line'>554</span> </span><span class="WHIT">		</span><span class="NAME">makeRequest</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>555</span> </span><span class="WHIT">			</span><span class="COMM">// ClientServices needs to be initialized with a config for restHost, auth, and locale</span><span class="WHIT">
+<span class='line'>556</span> </span><span class="WHIT">			</span><span class="NAME">_isInited</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>557</span> </span><span class="WHIT">			</span><span class="WHIT">
+<span class='line'>558</span> </span><span class="WHIT">			</span><span class="COMM">// Allow mixin of auth and locale headers</span><span class="WHIT">
+<span class='line'>559</span> </span><span class="WHIT">			</span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>560</span> </span><span class="WHIT">			</span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">gadgets.io.RequestParameters.HEADERS</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">gadgets.io.RequestParameters.HEADERS</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>561</span> </span><span class="WHIT">			</span><span class="WHIT">
+<span class='line'>562</span> </span><span class="WHIT">			</span><span class="COMM">// Add Basic auth to request header</span><span class="WHIT">
+<span class='line'>563</span> </span><span class="WHIT">	        </span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">gadgets.io.RequestParameters.HEADERS</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">Authorization</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"Basic "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_config.authorization</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>564</span> </span><span class="WHIT">	        </span><span class="COMM">//Locale</span><span class="WHIT">
+<span class='line'>565</span> </span><span class="WHIT">            </span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">gadgets.io.RequestParameters.HEADERS</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">locale</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_config.locale</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>566</span> 
+<span class='line'>567</span> </span><span class="WHIT">	        </span><span class="NAME">gadgets.io.makeRequest</span><span class="PUNC">(</span><span class="NAME">encodeURI</span><span class="PUNC">(</span><span class="STRN">"http://"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_config.restHost</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>568</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>569</span> 
+<span class='line'>570</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>571</span>          * @private
+<span class='line'>572</span>          * Utility function to make a subscription to a particular topic. Only one
+<span class='line'>573</span>          * callback function is registered to a particular topic at any time.
+<span class='line'>574</span>          * @param {String} topic
+<span class='line'>575</span>          *     The full topic name. The topic name should follow the OpenAjax
+<span class='line'>576</span>          *     convention using dot notation (ex: finesse.api.User.1000).
+<span class='line'>577</span>          * @param {Function} callback
+<span class='line'>578</span>          *     The function that should be invoked with the data when an event
+<span class='line'>579</span>          *     is delivered to the specific topic.
+<span class='line'>580</span>          * @returns {Boolean}
+<span class='line'>581</span>          *     True if the subscription was made successfully and the callback was
+<span class='line'>582</span>          *     been registered. False if the subscription already exist, the
+<span class='line'>583</span>          *     callback was not overwritten.
+<span class='line'>584</span>          */</span><span class="WHIT">
+<span class='line'>585</span> </span><span class="WHIT">        </span><span class="NAME">subscribe</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>586</span> </span><span class="WHIT">            </span><span class="NAME">_isInited</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>587</span> 
+<span class='line'>588</span> </span><span class="WHIT">            </span><span class="COMM">//Ensure that the same subscription isn't made twice.</span><span class="WHIT">
+<span class='line'>589</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>590</span> </span><span class="WHIT">                </span><span class="COMM">//Store the subscription ID using the topic name as the key.</span><span class="WHIT">
+<span class='line'>591</span> </span><span class="WHIT">                </span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_hub.subscribe</span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>592</span> </span><span class="WHIT">                    </span><span class="COMM">//Invoke the callback just with the data object.</span><span class="WHIT">
+<span class='line'>593</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>594</span> </span><span class="WHIT">                        </span><span class="NAME">callback</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>595</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>596</span> </span><span class="WHIT">                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>597</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>598</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>599</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>600</span> 
+<span class='line'>601</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>602</span>          * @private
+<span class='line'>603</span>          * Unsubscribe from a particular topic.
+<span class='line'>604</span>          * @param {String} topic
+<span class='line'>605</span>          *     The full topic name.
+<span class='line'>606</span>          */</span><span class="WHIT">
+<span class='line'>607</span> </span><span class="WHIT">        </span><span class="NAME">unsubscribe</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>608</span> </span><span class="WHIT">            </span><span class="NAME">_isInited</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>609</span> 
+<span class='line'>610</span> </span><span class="WHIT">            </span><span class="COMM">//Unsubscribe from the topic using the subscription ID recorded when</span><span class="WHIT">
+<span class='line'>611</span> </span><span class="WHIT">            </span><span class="COMM">//the subscription was made, then delete the ID from data structure.</span><span class="WHIT">
+<span class='line'>612</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>613</span> </span><span class="WHIT">                </span><span class="NAME">_hub.unsubscribe</span><span class="PUNC">(</span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>614</span> </span><span class="WHIT">                </span><span class="KEYW">delete</span><span class="WHIT"> </span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>615</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>616</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>617</span> 
+<span class='line'>618</span> </span><span class="WHIT">	    </span><span class="COMM">/**
+<span class='line'>619</span>          * @private
+<span class='line'>620</span> 	     * Make a request to the request channel to have the Master subscribe
+<span class='line'>621</span> 	     * to a node.
+<span class='line'>622</span>          * @param {String} node
+<span class='line'>623</span>          *     The node to subscribe to.
+<span class='line'>624</span> 	     */</span><span class="WHIT">
+<span class='line'>625</span> </span><span class="WHIT">	    </span><span class="NAME">subscribeNode</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>626</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>627</span> </span><span class="WHIT">				</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"ClientServices.subscribeNode: handler is not a function"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>628</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>629</span> </span><span class="WHIT">			</span><span class="WHIT">
+<span class='line'>630</span> </span><span class="WHIT">			</span><span class="COMM">// Construct the request to send to MasterPublisher through the OpenAjax Hub</span><span class="WHIT">
+<span class='line'>631</span> </span><span class="WHIT">	        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>632</span> </span><span class="WHIT">	            </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"SubscribeNodeReq"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>633</span> </span><span class="WHIT">	            </span><span class="NAME">data</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="NAME">node</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">node</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>634</span> </span><span class="WHIT">	            </span><span class="NAME">invokeID</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_util.generateUUID</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>635</span> </span><span class="WHIT">	        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>636</span> </span><span class="WHIT">			</span><span class="NAME">responseTopic</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_topics.RESPONSES</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"."</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">data.invokeID</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>637</span> </span><span class="WHIT">			</span><span class="NAME">_this</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>638</span> 
+<span class='line'>639</span> </span><span class="WHIT">			</span><span class="COMM">// We need to first subscribe to the response channel</span><span class="WHIT">
+<span class='line'>640</span> </span><span class="WHIT">			</span><span class="NAME">this.subscribe</span><span class="PUNC">(</span><span class="NAME">responseTopic</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>641</span> </span><span class="WHIT">				</span><span class="COMM">// Since this channel is only used for this singular request,</span><span class="WHIT">
+<span class='line'>642</span> </span><span class="WHIT">				</span><span class="COMM">// we are not interested anymore.</span><span class="WHIT">
+<span class='line'>643</span> </span><span class="WHIT">				</span><span class="COMM">// This is also critical to not leaking memory by having OpenAjax</span><span class="WHIT">
+<span class='line'>644</span> </span><span class="WHIT">				</span><span class="COMM">// store a bunch of orphaned callback handlers that enclose on</span><span class="WHIT">
+<span class='line'>645</span> </span><span class="WHIT">				</span><span class="COMM">// our entire ClientServices singleton</span><span class="WHIT">
+<span class='line'>646</span> </span><span class="WHIT">				</span><span class="NAME">_this.unsubscribe</span><span class="PUNC">(</span><span class="NAME">responseTopic</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>647</span> </span><span class="WHIT">				</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>648</span> </span><span class="WHIT">					</span><span class="NAME">handler</span><span class="PUNC">(</span><span class="NAME">data.invokeID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>649</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>650</span> </span><span class="WHIT">	        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>651</span> </span><span class="WHIT">			</span><span class="COMM">// Then publish the request on the request channel</span><span class="WHIT">
+<span class='line'>652</span> </span><span class="WHIT">	        </span><span class="NAME">_hub.publish</span><span class="PUNC">(</span><span class="NAME">_topics.REQUESTS</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>653</span> </span><span class="WHIT">	    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>654</span> 
+<span class='line'>655</span> </span><span class="WHIT">	    </span><span class="COMM">/**
+<span class='line'>656</span>          * @private
+<span class='line'>657</span> 	     * Make a request to the request channel to have the Master unsubscribe
+<span class='line'>658</span> 	     * from a node.
+<span class='line'>659</span>          * @param {String} node
+<span class='line'>660</span>          *     The node to unsubscribe from.
+<span class='line'>661</span> 	     */</span><span class="WHIT">
+<span class='line'>662</span> </span><span class="WHIT">	    </span><span class="NAME">unsubscribeNode</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">subid</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>663</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>664</span> </span><span class="WHIT">				</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"ClientServices.unsubscribeNode: handler is not a function"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>665</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>666</span> </span><span class="WHIT">			</span><span class="WHIT">
+<span class='line'>667</span> </span><span class="WHIT">			</span><span class="COMM">// Construct the request to send to MasterPublisher through the OpenAjax Hub</span><span class="WHIT">
+<span class='line'>668</span> </span><span class="WHIT">	        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>669</span> </span><span class="WHIT">	            </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"UnsubscribeNodeReq"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>670</span> </span><span class="WHIT">	            </span><span class="NAME">data</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>671</span> </span><span class="WHIT">					</span><span class="NAME">node</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">node</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>672</span> </span><span class="WHIT">					</span><span class="NAME">subid</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">subid</span><span class="WHIT">
+<span class='line'>673</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>674</span> </span><span class="WHIT">	            </span><span class="NAME">invokeID</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_util.generateUUID</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>675</span> </span><span class="WHIT">	        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>676</span> </span><span class="WHIT">			</span><span class="NAME">responseTopic</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_topics.RESPONSES</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"."</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">data.invokeID</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>677</span> </span><span class="WHIT">			</span><span class="NAME">_this</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>678</span> 
+<span class='line'>679</span> </span><span class="WHIT">			</span><span class="COMM">// We need to first subscribe to the response channel</span><span class="WHIT">
+<span class='line'>680</span> </span><span class="WHIT">			</span><span class="NAME">this.subscribe</span><span class="PUNC">(</span><span class="NAME">responseTopic</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>681</span> </span><span class="WHIT">				</span><span class="COMM">// Since this channel is only used for this singular request,</span><span class="WHIT">
+<span class='line'>682</span> </span><span class="WHIT">				</span><span class="COMM">// we are not interested anymore.</span><span class="WHIT">
+<span class='line'>683</span> </span><span class="WHIT">				</span><span class="COMM">// This is also critical to not leaking memory by having OpenAjax</span><span class="WHIT">
+<span class='line'>684</span> </span><span class="WHIT">				</span><span class="COMM">// store a bunch of orphaned callback handlers that enclose on</span><span class="WHIT">
+<span class='line'>685</span> </span><span class="WHIT">				</span><span class="COMM">// our entire ClientServices singleton</span><span class="WHIT">
+<span class='line'>686</span> </span><span class="WHIT">				</span><span class="NAME">_this.unsubscribe</span><span class="PUNC">(</span><span class="NAME">responseTopic</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>687</span> </span><span class="WHIT">				</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>688</span> </span><span class="WHIT">					</span><span class="NAME">handler</span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>689</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>690</span> </span><span class="WHIT">	        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>691</span> </span><span class="WHIT">			</span><span class="COMM">// Then publish the request on the request channel</span><span class="WHIT">
+<span class='line'>692</span> </span><span class="WHIT">	        </span><span class="NAME">_hub.publish</span><span class="PUNC">(</span><span class="NAME">_topics.REQUESTS</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>693</span> </span><span class="WHIT">	    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>694</span> </span><span class="WHIT">	    </span><span class="WHIT">
+<span class='line'>695</span> </span><span class="WHIT">	    </span><span class="COMM">/**
+<span class='line'>696</span>          * @private
+<span class='line'>697</span>          * Make a request to the request channel to have the Master connect to the XMPP server via BOSH
+<span class='line'>698</span>          */</span><span class="WHIT">
+<span class='line'>699</span> </span><span class="WHIT">	    </span><span class="NAME">makeConnectionReq</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>700</span> </span><span class="WHIT">	        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>701</span> </span><span class="WHIT">	            </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ConnectionReq"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>702</span> </span><span class="WHIT">	            </span><span class="NAME">data</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>703</span> </span><span class="WHIT">	                </span><span class="NAME">id</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_config.id</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>704</span> </span><span class="WHIT">	                </span><span class="NAME">password</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_config.password</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>705</span> </span><span class="WHIT">	                </span><span class="NAME">xmppDomain</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_config.xmppDomain</span><span class="WHIT">
+<span class='line'>706</span> </span><span class="WHIT">	            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>707</span> </span><span class="WHIT">	            </span><span class="NAME">invokeID</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>708</span> </span><span class="WHIT">	        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>709</span> </span><span class="WHIT">	        </span><span class="NAME">_hub.publish</span><span class="PUNC">(</span><span class="NAME">_topics.REQUESTS</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>710</span> </span><span class="WHIT">	    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>711</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>712</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>713</span>          * Set's the global logger for this Client Services instance.
+<span class='line'>714</span>          * @param {Object} logger
+<span class='line'>715</span>          *     Logger object with the following attributes defined:&lt;ul>
+<span class='line'>716</span>          *         &lt;li>&lt;b>log:&lt;/b> function (msg) to simply log a message
+<span class='line'>717</span>          *     &lt;/ul>
+<span class='line'>718</span>          */</span><span class="WHIT">
+<span class='line'>719</span> </span><span class="WHIT">		</span><span class="NAME">setLogger</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">logger</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>720</span> </span><span class="WHIT">			</span><span class="COMM">// We want to check the logger coming in so we don't have to check every time it is called.</span><span class="WHIT">
+<span class='line'>721</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">logger</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">logger</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"object"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">logger.log</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>722</span> </span><span class="WHIT">				</span><span class="NAME">_logger</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">logger</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>723</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>724</span> </span><span class="WHIT">				</span><span class="COMM">// We are resetting it to an empty object so that _logger.log in .log is falsy.</span><span class="WHIT">
+<span class='line'>725</span> </span><span class="WHIT">				</span><span class="NAME">_logger</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>726</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>727</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>728</span> </span><span class="WHIT">		</span><span class="WHIT">
+<span class='line'>729</span> </span><span class="WHIT">	    </span><span class="COMM">/**
+<span class='line'>730</span>          * @private
+<span class='line'>731</span>          * Centralized logger.log method for external logger
+<span class='line'>732</span>          * @param {String} msg
+<span class='line'>733</span>          *     Message to log
+<span class='line'>734</span>          */</span><span class="WHIT">
+<span class='line'>735</span> </span><span class="WHIT">		</span><span class="NAME">log</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_log</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>736</span> 
+<span class='line'>737</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>738</span>          * Initiates the Client Services with the specified config parameters.
+<span class='line'>739</span>          * Enabling the Client Services as Master will trigger the establishment
+<span class='line'>740</span>          * of a BOSH event connection.
+<span class='line'>741</span>          * @param {Object} config
+<span class='line'>742</span>          *     Configuration object containing properties used for making REST requests:&lt;ul>
+<span class='line'>743</span>          *         &lt;li>&lt;b>host:&lt;/b> The Finesse server IP/host as reachable from the browser
+<span class='line'>744</span>          *         &lt;li>&lt;b>restHost:&lt;/b> The Finesse API IP/host as reachable from the gadget container
+<span class='line'>745</span>          *         &lt;li>&lt;b>id:&lt;/b> The ID of the user. This is an optional param as long as the
+<span class='line'>746</span>          *         appropriate authorization string is provided, otherwise it is
+<span class='line'>747</span>          *         required.&lt;/li>
+<span class='line'>748</span>          *         &lt;li>&lt;b>password:&lt;/b> The password belonging to the user. This is an optional param as
+<span class='line'>749</span>          *         long as the appropriate authorization string is provided,
+<span class='line'>750</span>          *         otherwise it is required.&lt;/li>
+<span class='line'>751</span>          *         &lt;li>&lt;b>authorization:&lt;/b> The base64 encoded "id:password" authentication string. This
+<span class='line'>752</span>          *         param is provided to allow the ability to hide the password
+<span class='line'>753</span>          *         param. If provided, the id and the password extracted from this
+<span class='line'>754</span>          *         string will be used over the config.id and config.password.&lt;/li>
+<span class='line'>755</span>          *     &lt;/ul>
+<span class='line'>756</span>          * @throws {Error} If required constructor parameter is missing.
+<span class='line'>757</span>          */</span><span class="WHIT">
+<span class='line'>758</span> </span><span class="WHIT">        </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>759</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_inited</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>760</span> </span><span class="WHIT">                </span><span class="COMM">//Validate the properties within the config object if one is provided.</span><span class="WHIT">
+<span class='line'>761</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"object"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT">
+<span class='line'>762</span> </span><span class="WHIT">                     </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config.host</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">config.host.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">config.restHost</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>763</span> </span><span class="WHIT">                     </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config.authorization</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT">
+<span class='line'>764</span> </span><span class="WHIT">                             </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config.id</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT">
+<span class='line'>765</span> </span><span class="WHIT">                                     </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config.password</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>766</span> </span><span class="WHIT">                    </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"Config object contains invalid properties."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>767</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>768</span> 
+<span class='line'>769</span> </span><span class="WHIT">                </span><span class="COMM">// Initialize configuration</span><span class="WHIT">
+<span class='line'>770</span> </span><span class="WHIT">                </span><span class="NAME">_config</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>771</span> 
+<span class='line'>772</span> </span><span class="WHIT">                </span><span class="COMM">// Set shortcuts</span><span class="WHIT">
+<span class='line'>773</span> </span><span class="WHIT">                </span><span class="NAME">_util</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>774</span> </span><span class="WHIT">                </span><span class="NAME">_hub</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">gadgets.Hub</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>775</span> </span><span class="WHIT">                </span><span class="NAME">_io</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">gadgets.io</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>776</span> </span><span class="WHIT">                </span><span class="NAME">_topics</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.clientservices.Topics</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>777</span> 
+<span class='line'>778</span> </span><span class="WHIT">                </span><span class="COMM">//If the authorization string is provided, then use that to</span><span class="WHIT">
+<span class='line'>779</span> </span><span class="WHIT">                </span><span class="COMM">//extract the ID and the password. Otherwise use the ID and</span><span class="WHIT">
+<span class='line'>780</span> </span><span class="WHIT">                </span><span class="COMM">//password from the respective ID and password params.</span><span class="WHIT">
+<span class='line'>781</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_config.authorization</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>782</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">creds</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_util.getCredentials</span><span class="PUNC">(</span><span class="NAME">_config.authorization</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>783</span> </span><span class="WHIT">                    </span><span class="NAME">_config.id</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">creds.id</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>784</span> </span><span class="WHIT">                    </span><span class="NAME">_config.password</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">creds.password</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>785</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>786</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>787</span> </span><span class="WHIT">                    </span><span class="NAME">_config.authorization</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_util.b64Encode</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>788</span> </span><span class="WHIT">                            </span><span class="NAME">_config.id</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">":"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_config.password</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>789</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>790</span> 
+<span class='line'>791</span> </span><span class="WHIT">                </span><span class="NAME">_inited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>792</span> 
+<span class='line'>793</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_hub</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>794</span> </span><span class="WHIT">                    </span><span class="COMM">//Subscribe to receive connection information. Since it is possible that</span><span class="WHIT">
+<span class='line'>795</span> </span><span class="WHIT">                    </span><span class="COMM">//the client comes up after the Master comes up, the client will need</span><span class="WHIT">
+<span class='line'>796</span> </span><span class="WHIT">                    </span><span class="COMM">//to make a request to have the Master send the latest connection info.</span><span class="WHIT">
+<span class='line'>797</span> </span><span class="WHIT">                    </span><span class="COMM">//It would be possible that all clients get connection info again.</span><span class="WHIT">
+<span class='line'>798</span> </span><span class="WHIT">                    </span><span class="NAME">this.subscribe</span><span class="PUNC">(</span><span class="NAME">_topics.EVENTS_CONNECTION_INFO</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_connInfoHandler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>799</span> </span><span class="WHIT">                    </span><span class="NAME">_makeConnectionInfoReq</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>800</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>801</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>802</span> 
+<span class='line'>803</span> </span><span class="WHIT">            </span><span class="COMM">//Return the CS object for object chaining.</span><span class="WHIT">
+<span class='line'>804</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>805</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>806</span> 
+<span class='line'>807</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>808</span>          * @private
+<span class='line'>809</span>          * Initializes the BOSH component of this ClientServices instance. This establishes
+<span class='line'>810</span>          * the BOSH connection and will trigger the registered handlers as the connection
+<span class='line'>811</span>          * status changes respectively:&lt;ul>
+<span class='line'>812</span>          *     &lt;li>registerOnConnectingHandler&lt;/li>
+<span class='line'>813</span>          *     &lt;li>registerOnConnectHandler&lt;/li>
+<span class='line'>814</span>          *     &lt;li>registerOnDisconnectHandler&lt;/li>
+<span class='line'>815</span>          *     &lt;li>registerOnDisconnectingHandler&lt;/li>
+<span class='line'>816</span>          *     &lt;li>registerOnReconnectingHandler&lt;/li>
+<span class='line'>817</span>          *     &lt;li>registerOnUnloadingHandler&lt;/li>
+<span class='line'>818</span>          * &lt;ul>
+<span class='line'>819</span>          *
+<span class='line'>820</span>          * @param {Object} config
+<span class='line'>821</span>          *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>822</span>          *         &lt;li>&lt;b>xmppDomain:&lt;/b> {String} The domain of the XMPP server. Available from the SystemInfo object.
+<span class='line'>823</span>          *         This is used to construct the JID: user@domain.com&lt;/li>
+<span class='line'>824</span>          *         &lt;li>&lt;b>pubsubDomain:&lt;/b> {String} The pub sub domain where the pub sub service is running.
+<span class='line'>825</span>          *         Available from the SystemInfo object.
+<span class='line'>826</span>          *         This is used for creating or removing subscriptions.&lt;/li>
+<span class='line'>827</span>          *         &lt;li>&lt;b>resource:&lt;/b> {String} The resource to connect to the notification server with.&lt;/li>
+<span class='line'>828</span>          *     &lt;/ul>
+<span class='line'>829</span>          */</span><span class="WHIT">
+<span class='line'>830</span> </span><span class="WHIT">        </span><span class="NAME">initBosh</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>831</span> </span><span class="WHIT">            </span><span class="COMM">//Validate the properties within the config object if one is provided.</span><span class="WHIT">
+<span class='line'>832</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"object"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config.xmppDomain</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">config.pubsubDomain</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>833</span> </span><span class="WHIT">                </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"Config object contains invalid properties."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>834</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>835</span> </span><span class="WHIT">            </span><span class="WHIT">
+<span class='line'>836</span> </span><span class="WHIT">            </span><span class="COMM">// Mixin the required information for establishing the BOSH connection</span><span class="WHIT">
+<span class='line'>837</span> </span><span class="WHIT">            </span><span class="NAME">_config.xmppDomain</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">config.xmppDomain</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>838</span> </span><span class="WHIT">            </span><span class="NAME">_config.pubsubDomain</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">config.pubsubDomain</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>839</span> </span><span class="WHIT">            </span><span class="NAME">_config.resource</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">config.resource</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>840</span> </span><span class="WHIT">            </span><span class="WHIT">
+<span class='line'>841</span> </span><span class="WHIT">            </span><span class="COMM">//Initiate Master launch sequence</span><span class="WHIT">
+<span class='line'>842</span> </span><span class="WHIT">            </span><span class="NAME">_becomeMaster</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>843</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>844</span> 
+<span class='line'>845</span> </span><span class="WHIT">        </span><span class="COMM">//BEGIN TEST CODE//</span><span class="WHIT">
+<span class='line'>846</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>847</span>          * Test code added to expose private functions that are used by unit test
+<span class='line'>848</span>          * framework. This section of code is removed during the build process
+<span class='line'>849</span>          * before packaging production code. The [begin|end]TestSection are used
+<span class='line'>850</span>          * by the build to identify the section to strip.
+<span class='line'>851</span>          * @ignore
+<span class='line'>852</span>          */</span><span class="WHIT">
+<span class='line'>853</span> </span><span class="WHIT">        </span><span class="NAME">beginTestSection</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>854</span> 
+<span class='line'>855</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>856</span>          * @ignore
+<span class='line'>857</span>          */</span><span class="WHIT">
+<span class='line'>858</span> </span><span class="WHIT">        </span><span class="NAME">getTestObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>859</span> </span><span class="WHIT">            </span><span class="COMM">//Load mock dependencies.</span><span class="WHIT">
+<span class='line'>860</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_mock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">MockControl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>861</span> </span><span class="WHIT">            </span><span class="NAME">_hub</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_mock.createMock</span><span class="PUNC">(</span><span class="NAME">gadgets.Hub</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>862</span> </span><span class="WHIT">            </span><span class="NAME">_io</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_mock.createMock</span><span class="PUNC">(</span><span class="NAME">gadgets.io</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>863</span> 
+<span class='line'>864</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>865</span> </span><span class="WHIT">                </span><span class="COMM">//Expose mock dependencies</span><span class="WHIT">
+<span class='line'>866</span> </span><span class="WHIT">                </span><span class="NAME">mock</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_mock</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>867</span> </span><span class="WHIT">                </span><span class="NAME">hub</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_hub</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>868</span> </span><span class="WHIT">                </span><span class="NAME">io</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_io</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>869</span> 
+<span class='line'>870</span> </span><span class="WHIT">                </span><span class="COMM">//Expose internal private functions</span><span class="WHIT">
+<span class='line'>871</span> </span><span class="WHIT">                </span><span class="NAME">subscriptionID</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_subscriptionID</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>872</span> </span><span class="WHIT">                </span><span class="NAME">connInfoHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_connInfoHandler</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>873</span> 
+<span class='line'>874</span> </span><span class="WHIT">                </span><span class="NAME">reset</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>875</span> </span><span class="WHIT">                    </span><span class="NAME">_inited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>876</span> </span><span class="WHIT">                    </span><span class="NAME">_onConnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>877</span> </span><span class="WHIT">                    </span><span class="NAME">_onConnectHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>878</span> </span><span class="WHIT">                    </span><span class="NAME">_onDisconnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>879</span> </span><span class="WHIT">                    </span><span class="NAME">_onDisconnectHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>880</span> </span><span class="WHIT">                    </span><span class="NAME">_onReconnectingHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>881</span> </span><span class="WHIT">                    </span><span class="NAME">_connInfo</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>882</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>883</span> </span><span class="WHIT">                </span><span class="NAME">setUtil</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>884</span> </span><span class="WHIT">                    </span><span class="NAME">_util</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>885</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>886</span> </span><span class="WHIT">                </span><span class="NAME">setConfig</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>887</span> </span><span class="WHIT">                    </span><span class="NAME">_config</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>888</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>889</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>890</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>891</span> 
+<span class='line'>892</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>893</span>          * @ignore
+<span class='line'>894</span>          */</span><span class="WHIT">
+<span class='line'>895</span> </span><span class="WHIT">        </span><span class="NAME">endTestSection</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT">
+<span class='line'>896</span> </span><span class="WHIT">        </span><span class="COMM">//END TEST CODE//</span><span class="WHIT">
+<span class='line'>897</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>898</span> </span><span class="PUNC">}</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>899</span> </span></pre></body></html>

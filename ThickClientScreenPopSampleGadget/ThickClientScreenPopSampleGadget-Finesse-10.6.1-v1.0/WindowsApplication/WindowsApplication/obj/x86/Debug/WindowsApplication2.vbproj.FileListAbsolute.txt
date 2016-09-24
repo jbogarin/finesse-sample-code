@@ -1,0 +1,28 @@
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\bin\Debug\WindowsApplication2.exe
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\bin\Debug\WindowsApplication2.pdb
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\bin\Debug\WindowsApplication2.xml
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\ResolveAssemblyReference.cache
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.Resources.resources
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\GenerateResource.read.1.tlog
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\GenerateResource.write.1.tlog
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.exe
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.xml
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.pdb
+c:\users\dlender\documents\visual studio 2010\Projects\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.Form1.resources
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPop\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.exe
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPop\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.xml
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPop\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.pdb
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.exe
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.xml
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.pdb
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\bin\Debug\WindowsApplication2.exe
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\bin\Debug\WindowsApplication2.pdb
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\bin\Debug\WindowsApplication2.xml
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.Form1.resources
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\WindowsApplication2.Resources.resources
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication2\WindowsApplication2\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication\WindowsApplication2\obj\x86\Debug\WindowsApplication2.exe
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication\WindowsApplication2\obj\x86\Debug\WindowsApplication2.xml
+C:\Users\dlender\Documents\Finesse\10.0(1)\Samples\ThickClientScreenPopSampleGadget\WindowsApplication\WindowsApplication2\obj\x86\Debug\WindowsApplication2.pdb

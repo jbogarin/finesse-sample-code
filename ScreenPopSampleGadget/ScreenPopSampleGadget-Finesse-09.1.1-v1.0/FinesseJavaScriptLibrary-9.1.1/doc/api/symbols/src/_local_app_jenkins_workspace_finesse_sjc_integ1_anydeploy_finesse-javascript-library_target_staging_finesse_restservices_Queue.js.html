@@ -1,0 +1,126 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview JavaScript representation of the Finesse Queue object
+<span class='line'>  3</span>  * @author &lt;a href="mailto:tchan2@cisco.com">Tony Chan&lt;/a>
+<span class='line'>  4</span>  * @name finesse.restservices.Queue
+<span class='line'>  5</span>  * @requires finesse.clientservices.ClientServices
+<span class='line'>  6</span>  * @requires Class
+<span class='line'>  7</span>  * @requires finesse.FinesseBase
+<span class='line'>  8</span>  * @requires finesse.restservices.RestBase
+<span class='line'>  9</span>  */</span><span class="WHIT">
+<span class='line'> 10</span> 
+<span class='line'> 11</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 13</span> 
+<span class='line'> 14</span> </span><span class="COMM">/**
+<span class='line'> 15</span>  * @class
+<span class='line'> 16</span>  * JavaScript representation of a Queue object. Also exposes methods to operate
+<span class='line'> 17</span>  * on the object against the server.
+<span class='line'> 18</span>  *
+<span class='line'> 19</span>  * @constructor
+<span class='line'> 20</span>  * @borrows finesse.restservices.RestBase as finesse.restservices.Queue
+<span class='line'> 21</span>  */</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="NAME">finesse.restservices.Queue</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.RestBase.extend</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 23</span> 
+<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 25</span>      * Initialize the user object.
+<span class='line'> 26</span>      * @param id is the REST id
+<span class='line'> 27</span>      * @param callbacks are the callback handlers (onLoad & onError)
+<span class='line'> 28</span>      **/</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">id</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">restObj</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 30</span> </span><span class="WHIT">        </span><span class="NAME">this._super</span><span class="PUNC">(</span><span class="NAME">id</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">restObj</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 31</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 32</span> 
+<span class='line'> 33</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 34</span>      * Gets the REST class for the current object - this is the Queue object.
+<span class='line'> 35</span>      */</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT">    </span><span class="NAME">getRestClass</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Queue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 39</span> 
+<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 41</span>      * Gets the REST type for the current object - this is a "Queue".
+<span class='line'> 42</span>      */</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="NAME">getRestType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"Queue"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 46</span> 
+<span class='line'> 47</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 48</span>      * Returns whether this object supports subscriptions
+<span class='line'> 49</span>      */</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="NAME">supportsSubscriptions</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">    
+<span class='line'> 54</span>     </span><span class="COMM">/**
+<span class='line'> 55</span>      * Specifies whether this object's subscriptions need to be explicitly requested
+<span class='line'> 56</span>      */</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">    </span><span class="NAME">explicitSubscription</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 58</span> 
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 60</span>      * Specifies that this object should not be refreshed; possible reasons are that
+<span class='line'> 61</span>      * it's encapsulating collection already does it
+<span class='line'> 62</span>      */</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="NAME">doNotRefresh</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    
+<span class='line'> 65</span>     </span><span class="COMM">/**
+<span class='line'> 66</span>      * Gets the node path for the current object - this is the team Users node
+<span class='line'> 67</span>      * @returns {String} The node path
+<span class='line'> 68</span>      */</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="NAME">getXMPPNodePath</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">    
+<span class='line'> 73</span>     </span><span class="COMM">/**
+<span class='line'> 74</span>      * Getter for the queue id
+<span class='line'> 75</span>      * @returns (String)
+<span class='line'> 76</span>      *     The id of the Queue
+<span class='line'> 77</span>      */</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="NAME">getId</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._id</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">	
+<span class='line'> 83</span> 	</span><span class="COMM">/**
+<span class='line'> 84</span> 	 * Getter for the queue name
+<span class='line'> 85</span> 	 * @returns (String)
+<span class='line'> 86</span> 	 *		The name of the Queue
+<span class='line'> 87</span> 	 */</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="NAME">getName</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">name</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">	
+<span class='line'> 93</span> 	</span><span class="COMM">/**
+<span class='line'> 94</span>      * Getter for the queue statistics.
+<span class='line'> 95</span>      * Supported statistics include:
+<span class='line'> 96</span>      *  - callsInQueue
+<span class='line'> 97</span>      *  - startTimeOfLongestCallInQueue
+<span class='line'> 98</span>      *  
+<span class='line'> 99</span>      *  These statistics can be accessed via dot notation:
+<span class='line'>100</span>      *  i.e.: getStatistics().callsInQueue
+<span class='line'>101</span>      * @returns (Object)
+<span class='line'>102</span>      *      The Object with different statistics as properties.
+<span class='line'>103</span>      */</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">	</span><span class="NAME">getStatistics</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">	    </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">	    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">statistics</span><span class="PUNC">;</span><span class="WHIT">	    
+<span class='line'>107</span> 	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>108</span> 
+<span class='line'>109</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>110</span>      * Parses a uriString to retrieve the id portion
+<span class='line'>111</span>      * @param {String} uriString
+<span class='line'>112</span>      * @return {String} id
+<span class='line'>113</span>      */</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">    </span><span class="NAME">_parseIdFromUriString</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">uriString</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities.getId</span><span class="PUNC">(</span><span class="NAME">uriString</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>117</span> 
+<span class='line'>118</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>119</span> </span></pre></body></html>

@@ -1,0 +1,146 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview Allows each gadget to communicate with the server to send logs.
+<span class='line'>  3</span>  * @name finesse.cslogger.FinesseLogger
+<span class='line'>  4</span>  */</span><span class="WHIT">
+<span class='line'>  5</span> 
+<span class='line'>  6</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  7</span> </span><span class="NAME">finesse.cslogger</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.cslogger</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  8</span> 
+<span class='line'>  9</span> </span><span class="COMM">/**
+<span class='line'> 10</span>  * @class
+<span class='line'> 11</span>  * Allows each product to initialize its method of storage
+<span class='line'> 12</span>  */</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="NAME">finesse.cslogger.FinesseLogger</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.cslogger.FinesseLogger</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 14</span> 
+<span class='line'> 15</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT">
+<span class='line'> 16</span> 
+<span class='line'> 17</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 18</span>      * Array use to collect ongoing logs in memory
+<span class='line'> 19</span>      * @private
+<span class='line'> 20</span>      */</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="WHIT">    </span><span class="NAME">_logArray</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 22</span> 
+<span class='line'> 23</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 24</span>      * The final data string sent to the server, =_logArray.join
+<span class='line'> 25</span>      * @private
+<span class='line'> 26</span>      */</span><span class="WHIT">
+<span class='line'> 27</span> </span><span class="WHIT">    </span><span class="NAME">_logStr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 28</span> 
+<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 30</span>      * Keep track of size of log
+<span class='line'> 31</span>      * @private
+<span class='line'> 32</span>      */</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">    </span><span class="NAME">_logSize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 34</span> 
+<span class='line'> 35</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 36</span>      * Flag to keep track show/hide of send log link
+<span class='line'> 37</span>      */</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">    </span><span class="NAME">_sendLogShown</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 39</span> 
+<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 41</span>      * Collect logs when onCollect called
+<span class='line'> 42</span>      * @private
+<span class='line'> 43</span>      */</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">    </span><span class="NAME">_collectMethod</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">      </span><span class="COMM">//Size of log should not exceed 1.5MB</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">info</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">maxLength</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1572864</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">      </span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">      </span><span class="COMM">//add size buffer equal to the size of info to be added when publish</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">	  </span><span class="NAME">info</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">navigator.userAgent</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"&#10;"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">	  </span><span class="NAME">info</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">escape</span><span class="PUNC">(</span><span class="NAME">info</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 51</span> 
+<span class='line'> 52</span> </span><span class="WHIT">        </span><span class="COMM">//If log was empty previously, fade in buttons</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_sendLogShown</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">            </span><span class="COMM">//call the fadeInSendLog() in Footer</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">            </span><span class="NAME">finesse.modules.Footer.sendLogAppear</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">            </span><span class="NAME">_sendLogShown</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">            </span><span class="NAME">_logSize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">info.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">		</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">		</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">		</span><span class="COMM">//escape all data to get accurate size (shindig will escape when it builds request)</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">		</span><span class="COMM">//escape 6 special chars for XML: &&lt;>"'\n</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">		</span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">data.replace</span><span class="PUNC">(</span><span class="REGX">/&/g</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"&amp;"</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">replace</span><span class="PUNC">(</span><span class="REGX">/"/g</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"&quot;"</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">replace</span><span class="PUNC">(</span><span class="REGX">/'/g</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"&#39;"</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">replace</span><span class="PUNC">(</span><span class="REGX">/>/g</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"&gt;"</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">replace</span><span class="PUNC">(</span><span class="REGX">/&lt;/g</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"&lt;"</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">replace</span><span class="PUNC">(</span><span class="REGX">/\n/g</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"&#10;"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">		</span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">escape</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">+</span><span class="STRN">"\n"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 65</span> 
+<span class='line'> 66</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">data.length</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">maxLength</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">			</span><span class="COMM">//make room for new data if log is exceeding max length</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">            </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_logSize</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">data.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NAME">maxLength</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">                </span><span class="NAME">_logSize</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_logArray.shift</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 72</span> 
+<span class='line'> 73</span> </span><span class="WHIT">        </span><span class="COMM">//Else push the log into memory, increment the log size</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">        </span><span class="NAME">_logArray.push</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 75</span> 
+<span class='line'> 76</span> </span><span class="WHIT">        </span><span class="COMM">//inc the size accordingly</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">        </span><span class="NAME">_logSize</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NAME">data.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 78</span> 
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 80</span> 
+<span class='line'> 81</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 82</span> 
+<span class='line'> 83</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'> 84</span>          * Initiate FinesseLogger.
+<span class='line'> 85</span>          *
+<span class='line'> 86</span>          * @param {String} id
+<span class='line'> 87</span>          *  id of the agent
+<span class='line'> 88</span>          * @param {Object} userObj
+<span class='line'> 89</span>          *  the parent object, used for constructing the restRequest URL
+<span class='line'> 90</span>          */</span><span class="WHIT">
+<span class='line'> 91</span> 
+<span class='line'> 92</span> </span><span class="WHIT">        </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">            </span><span class="NAME">finesse.clientservices.ClientServices.subscribe</span><span class="PUNC">(</span><span class="STRN">"finesse.clientLogging.*"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_collectMethod</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 95</span> 
+<span class='line'> 96</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'> 97</span>         * Publish logs to server and clear the memory
+<span class='line'> 98</span>         */</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">        </span><span class="NAME">publish</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">userObj</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callBack</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">            </span><span class="COMM">// Avoid null references.</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">            </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">            </span><span class="NAME">callBack</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callBack</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>103</span> 
+<span class='line'>104</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callBack.sending</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">                </span><span class="NAME">callBack.sending</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>107</span> 
+<span class='line'>108</span> </span><span class="WHIT">            </span><span class="COMM">//logs the basic version and machine info and escaped new line</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">            </span><span class="NAME">_logStr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">navigator.userAgent</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"&#10;"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">            </span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">            </span><span class="COMM">//join the logs to correct string format</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">            </span><span class="NAME">_logStr</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">unescape</span><span class="PUNC">(</span><span class="NAME">_logArray.join</span><span class="PUNC">(</span><span class="STRN">""</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>113</span> 
+<span class='line'>114</span> </span><span class="WHIT">            </span><span class="COMM">//turning log string to JSON obj</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">logObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">                    </span><span class="NAME">ClientLog</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">                    </span><span class="NAME">logData</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_logStr</span><span class="WHIT"> </span><span class="COMM">//_logStr</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">            </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">            </span><span class="NAME">tmpOnAdd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options.onAdd</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">options.onAdd</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">options.onAdd</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="WHIT">            </span><span class="NAME">options.onAdd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">                </span><span class="NAME">tmpOnAdd</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">                </span><span class="NAME">_logArray.length</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">_logSize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">                </span><span class="NAME">_sendLogShown</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">            </span><span class="COMM">//adding onLoad to the callbacks, this is the subscribe success case for the first time user subscribe to the client log node</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">            </span><span class="NAME">options.onLoad</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">clientLogObj</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">                </span><span class="NAME">clientLogObj.sendLogs</span><span class="PUNC">(</span><span class="NAME">logObj</span><span class="PUNC">,</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">                        </span><span class="NAME">error</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">callBack.error</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>133</span> 
+<span class='line'>134</span> </span><span class="WHIT">            </span><span class="NAME">userObj.getClientLog</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> 
+<span class='line'>138</span> </span><span class="PUNC">}</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>139</span> </span></pre></body></html>

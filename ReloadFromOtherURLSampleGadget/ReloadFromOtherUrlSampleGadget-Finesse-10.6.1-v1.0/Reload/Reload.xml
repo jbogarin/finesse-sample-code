@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<ModulePrefs title="Sample Reload Gadget"
+		description="Sample Reload Gadget">
+		<Require feature="settitle" />
+		<Require feature="dynamic-height" />
+		<Require feature="pubsub-2" />
+		<Require feature="setprefs" />
+	</ModulePrefs>
+
+<Content type="html">
+	<![CDATA[
+		<!DOCTYPE html>
+		<!-- Styling -->
+	    <link rel="stylesheet" href="Reload.css" type="text/css" />
+
+	    <!-- jQuery -->
+	    <script type="text/javascript" src="/desktop/assets/js/jquery.min.js"></script>
+	   
+	    <!-- Finesse Library -->
+	    <script type="text/javascript" src="/desktop/assets/js/finesse.js"></script>
+
+	    <!-- Gadget Business Logic -->
+	    <script type="text/javascript" src="Reload.js"></script>
+
+	    <!-- sample gadget -->
+		<body class="claro">
+			<button onClick="finesse.modules.Reload.reloadMyGadgetFromUrl('<your_server_url_here>');">Reload Gadget</button>
+		</body>
+
+		<script type="text/javascript">
+			gadgets.HubSettings.onConnect = function () {
+				finesse.modules.Reload.init();
+			};
+		</script>
+	]]>
+</Content>
+</Module>

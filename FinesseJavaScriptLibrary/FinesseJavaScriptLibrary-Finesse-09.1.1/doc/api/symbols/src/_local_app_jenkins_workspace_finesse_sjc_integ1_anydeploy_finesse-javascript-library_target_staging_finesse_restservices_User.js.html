@@ -1,0 +1,882 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview JavaScript representation of the Finesse User object
+<span class='line'>  3</span>  *
+<span class='line'>  4</span>  * @name finesse.restservices.User
+<span class='line'>  5</span>  * @requires finesse.clientservices.ClientServices
+<span class='line'>  6</span>  * @requires Class
+<span class='line'>  7</span>  * @requires finesse.FinesseBase
+<span class='line'>  8</span>  * @requires finesse.restservices.RestBase
+<span class='line'>  9</span>  */</span><span class="WHIT">
+<span class='line'> 10</span> 
+<span class='line'> 11</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 13</span> 
+<span class='line'> 14</span> </span><span class="COMM">/** @private */</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="NAME">finesse.restservices.User</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.RestBase.extend</span><span class="PUNC">(</span><span class="COMM">/** @lends finesse.restservices.User.prototype */</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 16</span> 
+<span class='line'> 17</span> </span><span class="WHIT">    </span><span class="NAME">_dialogs</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 18</span> </span><span class="WHIT">    </span><span class="NAME">_clientLogObj</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 19</span> </span><span class="WHIT">    </span><span class="NAME">_wrapUpReasons</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 20</span> </span><span class="WHIT">    </span><span class="NAME">_phoneBooks</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="WHIT">    </span><span class="NAME">_mediaPropertiesLayout</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="WHIT">    </span><span class="NAME">_queues</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 23</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 24</span>      * @class
+<span class='line'> 25</span>      * JavaScript representation of a User object. Also exposes methods to operate
+<span class='line'> 26</span>      * on the object against the server.
+<span class='line'> 27</span>      *
+<span class='line'> 28</span>      * @param {Object} options
+<span class='line'> 29</span>      *     An object with the following properties:&lt;ul>
+<span class='line'> 30</span>      *         &lt;li>&lt;b>id:&lt;/b> The id of the object being constructed&lt;/li>
+<span class='line'> 31</span>      *         &lt;li>&lt;b>onLoad(this): (optional)&lt;/b> when the object is successfully loaded from the server&lt;/li>
+<span class='line'> 32</span>      *         &lt;li>&lt;b>onChange(this): (optional)&lt;/b> when an update notification of the object is received&lt;/li>
+<span class='line'> 33</span>      *         &lt;li>&lt;b>onAdd(this): (optional)&lt;/b> when a notification that the object is created is received&lt;/li>
+<span class='line'> 34</span>      *         &lt;li>&lt;b>onDelete(this): (optional)&lt;/b> when a notification that the object is deleted is received&lt;/li>
+<span class='line'> 35</span>      *         &lt;li>&lt;b>onError(rsp): (optional)&lt;/b> if loading of the object fails, invoked with the error response object:&lt;ul>
+<span class='line'> 36</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'> 37</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'> 38</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>
+<span class='line'> 39</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'> 40</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'> 41</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'> 42</span>      *             &lt;/ul>&lt;/li>
+<span class='line'> 43</span>      *         &lt;/ul>&lt;/li>
+<span class='line'> 44</span>      *         &lt;li>&lt;b>parentObj: (optional)&lt;/b> The parent object&lt;/li>&lt;/ul>
+<span class='line'> 45</span>      * @constructs finesse.restservices.User
+<span class='line'> 46</span>      **/</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">    </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">        </span><span class="NAME">this._super</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 50</span> 
+<span class='line'> 51</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 52</span>      * @private
+<span class='line'> 53</span>      * Gets the REST class for the current object - this is the User object.
+<span class='line'> 54</span>      */</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">    </span><span class="NAME">getRestClass</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.User</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 58</span> 
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 60</span>     * @private
+<span class='line'> 61</span>      * Gets the REST type for the current object - this is a "User".
+<span class='line'> 62</span>      */</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="NAME">getRestType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"User"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 67</span>      * overloading this to return URI
+<span class='line'> 68</span>      */</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="NAME">getXMPPNodePath</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 73</span>     * @private
+<span class='line'> 74</span>      * Returns whether this object supports subscriptions
+<span class='line'> 75</span>      */</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">    </span><span class="NAME">supportsSubscriptions</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 79</span> 
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 81</span>      * Getter for the firstName of this User
+<span class='line'> 82</span>      * @returns {String}
+<span class='line'> 83</span>      *     The firstName for this User
+<span class='line'> 84</span>      */</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="NAME">getFirstName</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">firstName</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 89</span> 
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 91</span>      * Getter for the lastName of this User
+<span class='line'> 92</span>      * @returns {String}
+<span class='line'> 93</span>      *     The lastName for this User
+<span class='line'> 94</span>      */</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="NAME">getLastName</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">lastName</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 99</span> 
+<span class='line'>100</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>101</span>      * Getter for the extension of this User
+<span class='line'>102</span>      * @returns {String}
+<span class='line'>103</span>      *     The extension, if any, of this User
+<span class='line'>104</span>      */</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="NAME">getExtension</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">extension</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>109</span> 
+<span class='line'>110</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>111</span>      * Is user an agent?
+<span class='line'>112</span>      * @returns {boolean} if user has role of agent
+<span class='line'>113</span>      */</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">    </span><span class="NAME">hasAgentRole</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.hasRole</span><span class="PUNC">(</span><span class="STRN">"Agent"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>118</span> 
+<span class='line'>119</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>120</span>      * Is user a supervisor?
+<span class='line'>121</span>      * @returns {boolean} if user has role of supervisor
+<span class='line'>122</span>      */</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">    </span><span class="NAME">hasSupervisorRole</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.hasRole</span><span class="PUNC">(</span><span class="STRN">"Supervisor"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>127</span> 
+<span class='line'>128</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>129</span>      * Checks to see if user has "theRole"
+<span class='line'>130</span>      * @returns {boolean}
+<span class='line'>131</span>      */</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">    </span><span class="NAME">hasRole</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">theRole</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">result</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">roles</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> 
+<span class='line'>136</span> </span><span class="WHIT">        </span><span class="NAME">roles</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">roles.role</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">        </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">roles.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">roles</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'string'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">roles</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">theRole</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">                </span><span class="NAME">result</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">            </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">roles</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">theRole</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">                    </span><span class="NAME">result</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">                    </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>150</span> 
+<span class='line'>151</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">result</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>152</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>153</span> 
+<span class='line'>154</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>155</span>      * Getter for the state of this User
+<span class='line'>156</span>      * @returns {String}
+<span class='line'>157</span>      *     The current (or last fetched) state of this User
+<span class='line'>158</span>      */</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">    </span><span class="NAME">getState</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>161</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">state</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">    
+<span class='line'>164</span>     </span><span class="COMM">/**
+<span class='line'>165</span>      * Getter for the state change time of this User
+<span class='line'>166</span>      * @returns {String}
+<span class='line'>167</span>      *     The state change time of this User
+<span class='line'>168</span>      */</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">    </span><span class="NAME">getStateChangeTime</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">stateChangeTime</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>173</span> 
+<span class='line'>174</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>175</span>      * Checks to see if the user is considered a mobile agent by checking for
+<span class='line'>176</span>      * the existance of the mobileAgent node.
+<span class='line'>177</span>      * @returns {Boolean}
+<span class='line'>178</span>      *      True if this agent is a mobile agent.
+<span class='line'>179</span>      */</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">    </span><span class="NAME">isMobileAgent</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ma</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">mobileAgent</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">ma</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">ma</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"object"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>185</span> 
+<span class='line'>186</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>187</span>      * Getter for the mobile agent work mode.
+<span class='line'>188</span>      * @returns {String}
+<span class='line'>189</span>      *      If available, return the mobile agent work mode, otherwise null
+<span class='line'>190</span>      */</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">    </span><span class="NAME">getMobileAgentMode</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.isMobileAgent</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">mobileAgent.mode</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>198</span> 
+<span class='line'>199</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>200</span>      * Getter for the mobile agent dial number.
+<span class='line'>201</span>      * @returns {String}
+<span class='line'>202</span>      *      If available, return the mobile agent dial number, otherwise null.
+<span class='line'>203</span>      */</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">    </span><span class="NAME">getMobileAgentDialNumber</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.isMobileAgent</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">mobileAgent.dialNumber</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>211</span> 
+<span class='line'>212</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>213</span>      * Getter for a Dialogs collection object that is associated with User.
+<span class='line'>214</span>      * @returns {Dialogs}
+<span class='line'>215</span>      *     A Dialogs collection object.
+<span class='line'>216</span>      */</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">    </span><span class="NAME">getDialogs</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callbacks</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">        </span><span class="NAME">options.parentObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>221</span> 
+<span class='line'>222</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._dialogs</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>223</span> </span><span class="WHIT">            </span><span class="NAME">this._dialogs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialogs</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>225</span> 
+<span class='line'>226</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._dialogs</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>227</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>228</span> </span><span class="WHIT">    
+<span class='line'>229</span>     </span><span class="COMM">/**
+<span class='line'>230</span>      * Getter for a ClientLog object that is associated with User.
+<span class='line'>231</span>      * @returns {ClientLog}
+<span class='line'>232</span>      *     A ClientLog collection object.
+<span class='line'>233</span>      */</span><span class="WHIT">
+<span class='line'>234</span> </span><span class="WHIT">    </span><span class="NAME">getClientLog</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callbacks</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>235</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">        </span><span class="NAME">options.parentObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>237</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">       
+<span class='line'>239</span>         </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._clientLogObj</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">            </span><span class="NAME">this._clientLogObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.ClientLog</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>242</span> </span><span class="WHIT">        </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">options.onLoad</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">options.onLoad</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>244</span> </span><span class="WHIT">            </span><span class="NAME">options.onLoad</span><span class="PUNC">(</span><span class="NAME">this._clientLogObj</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>246</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>247</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._clientLogObj</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>248</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>249</span> </span><span class="WHIT">   
+<span class='line'>250</span>     </span><span class="COMM">/**
+<span class='line'>251</span>      * Getter for a Queues collection object that is associated with User.
+<span class='line'>252</span>      * @returns {Queues}
+<span class='line'>253</span>      *     A Queues collection object.
+<span class='line'>254</span>      */</span><span class="WHIT">
+<span class='line'>255</span> </span><span class="WHIT">    </span><span class="NAME">getQueues</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callbacks</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>256</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>257</span> </span><span class="WHIT">        </span><span class="NAME">options.parentObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>258</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>259</span> 
+<span class='line'>260</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._queues</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>261</span> </span><span class="WHIT">            </span><span class="NAME">this._queues</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Queues</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>262</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>263</span> 
+<span class='line'>264</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._queues</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>266</span> 
+<span class='line'>267</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>268</span>      * Getter for a WrapUpReasons collection object that is associated with User.
+<span class='line'>269</span>      * @param handlers
+<span class='line'>270</span>      * @returns {WrapUpReasons}
+<span class='line'>271</span>      *     A WrapUpReasons collection object.
+<span class='line'>272</span>      */</span><span class="WHIT">
+<span class='line'>273</span> </span><span class="WHIT">    </span><span class="NAME">getWrapUpReasons</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callbacks</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>274</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">        </span><span class="NAME">options.parentObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>277</span> 
+<span class='line'>278</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._wrapUpReasons</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>279</span> </span><span class="WHIT">            </span><span class="NAME">this._wrapUpReasons</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.WrapUpReasons</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>280</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>281</span> 
+<span class='line'>282</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._wrapUpReasons</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>284</span> 
+<span class='line'>285</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>286</span>      * Getter for a PhoneBooks collection object that is associated with User.
+<span class='line'>287</span>      * @param handlers
+<span class='line'>288</span>      * @returns {PhoneBooks}
+<span class='line'>289</span>      *     A PhoneBooks collection object.
+<span class='line'>290</span>      */</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="WHIT">    </span><span class="NAME">getPhoneBooks</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callbacks</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">        </span><span class="NAME">options.parentObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>295</span> 
+<span class='line'>296</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._phoneBooks</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="WHIT">            </span><span class="NAME">this._phoneBooks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.PhoneBooks</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>298</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>299</span> 
+<span class='line'>300</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._phoneBooks</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>302</span> 
+<span class='line'>303</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>304</span>      * Getter for a MediaPropertiesLayout object that is associated with User.
+<span class='line'>305</span>      * @returns {finesse.restservices.MediaPropertiesLayout}
+<span class='line'>306</span>      *     The MediaPropertiesLayout object associated with this user
+<span class='line'>307</span>      */</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="WHIT">    </span><span class="NAME">getMediaPropertiesLayout</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callbacks</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callbacks</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="WHIT">        </span><span class="NAME">options.parentObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>311</span> </span><span class="WHIT">        </span><span class="NAME">options.id</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._id</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>312</span> 
+<span class='line'>313</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>314</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._mediaPropertiesLayout</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="WHIT">            </span><span class="NAME">this._mediaPropertiesLayout</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.MediaPropertiesLayout</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>316</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>317</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._mediaPropertiesLayout</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>318</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>319</span> 
+<span class='line'>320</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>321</span>      * Getter for the supervised Teams this User (Supervisor) supervises, if any
+<span class='line'>322</span>      * @returns {Array}
+<span class='line'>323</span>      *     An array of teams supervised by this User (Supervisor)
+<span class='line'>324</span>      */</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">    </span><span class="NAME">getSupervisedTeams</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>327</span> 
+<span class='line'>328</span> </span><span class="WHIT">        </span><span class="KEYW">try</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>329</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities.getArray</span><span class="PUNC">(</span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">teams.Team</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>330</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">catch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>331</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>333</span> 
+<span class='line'>334</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>335</span> 
+<span class='line'>336</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>337</span>      * Perform an agent login for this user, associating him with the
+<span class='line'>338</span>      * specified extension.
+<span class='line'>339</span>      * @param {Object} params
+<span class='line'>340</span>      *     An object containing properties for agent login.
+<span class='line'>341</span>      * @param {String} params.extension
+<span class='line'>342</span>      *     The extension to associate with this user
+<span class='line'>343</span>      * @param {Object} [params.mobileAgent]
+<span class='line'>344</span>      *     A mobile agent object containing the mode and dial number properties.
+<span class='line'>345</span>      * @param {Object} params.handlers
+<span class='line'>346</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>347</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>348</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>349</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>350</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>351</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>352</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>353</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>354</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>355</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>356</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>357</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>358</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>359</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>360</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>361</span>      *         &lt;/ul>
+<span class='line'>362</span>      * @returns {finesse.restservices.User}
+<span class='line'>363</span>      *     This User object to allow cascading
+<span class='line'>364</span>      * @private
+<span class='line'>365</span>      */</span><span class="WHIT">
+<span class='line'>366</span> </span><span class="WHIT">    </span><span class="NAME">_login</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>367</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>368</span> </span><span class="WHIT">        </span><span class="NAME">restType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>369</span> </span><span class="WHIT">        
+<span class='line'>370</span>         </span><span class="COMM">// Protect against null derefernecing.</span><span class="WHIT">
+<span class='line'>371</span> </span><span class="WHIT">        </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>372</span> 
+<span class='line'>373</span> </span><span class="WHIT">        </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">restType</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>374</span> </span><span class="WHIT">            </span><span class="STRN">"state"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.User.States.LOGIN</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>375</span> </span><span class="WHIT">            </span><span class="STRN">"extension"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.extension</span><span class="WHIT">
+<span class='line'>376</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>377</span> 
+<span class='line'>378</span> </span><span class="WHIT">        </span><span class="COMM">// Create mobile agent node if available.</span><span class="WHIT">
+<span class='line'>379</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">params.mobileAgent</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"object"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>380</span> </span><span class="WHIT">            </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">restType</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">mobileAgent</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>381</span> </span><span class="WHIT">                </span><span class="STRN">"mode"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.mobileAgent.mode</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>382</span> </span><span class="WHIT">                </span><span class="STRN">"dialNumber"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.mobileAgent.dialNumber</span><span class="WHIT">
+<span class='line'>383</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>384</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>385</span> 
+<span class='line'>386</span> </span><span class="WHIT">        </span><span class="COMM">// Protect against null dereferencing of options allowing its (nonexistant) keys to be read as undefined</span><span class="WHIT">
+<span class='line'>387</span> </span><span class="WHIT">        </span><span class="NAME">handlers</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.handlers</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>388</span> 
+<span class='line'>389</span> </span><span class="WHIT">        </span><span class="NAME">this.restRequest</span><span class="PUNC">(</span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>390</span> </span><span class="WHIT">            </span><span class="NAME">method</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'PUT'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>391</span> </span><span class="WHIT">            </span><span class="NAME">success</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.success</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>392</span> </span><span class="WHIT">            </span><span class="NAME">error</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.error</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>393</span> </span><span class="WHIT">            </span><span class="NAME">content</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT">
+<span class='line'>394</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>395</span> 
+<span class='line'>396</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>397</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>398</span> 
+<span class='line'>399</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>400</span>      * Perform an agent login for this user, associating him with the
+<span class='line'>401</span>      * specified extension.
+<span class='line'>402</span>      * @param {String} extension
+<span class='line'>403</span>      *     The extension to associate with this user
+<span class='line'>404</span>      * @param {Object} handlers
+<span class='line'>405</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>406</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>407</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>408</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>409</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>410</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>411</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>412</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>413</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>414</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>415</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>416</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>417</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>418</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>419</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>420</span>      *         &lt;/ul>
+<span class='line'>421</span>      * @returns {finesse.restservices.User}
+<span class='line'>422</span>      *     This User object to allow cascading
+<span class='line'>423</span>      */</span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT">    </span><span class="NAME">login</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">extension</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>425</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>426</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">            </span><span class="STRN">"extension"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">extension</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="WHIT">            </span><span class="STRN">"handlers"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._login</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>431</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>432</span> 
+<span class='line'>433</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>434</span>      * Perform an agent login for this user, associating him with the
+<span class='line'>435</span>      * specified extension.
+<span class='line'>436</span>      * @param {String} extension
+<span class='line'>437</span>      *     The extension to associate with this user
+<span class='line'>438</span>      * @param {String} mode
+<span class='line'>439</span>      *     The mobile agent work mode as defined in finesse.restservices.User.WorkMode.
+<span class='line'>440</span>      * @param {String} extension
+<span class='line'>441</span>      *     The external dial number desired to be used by the mobile agent.
+<span class='line'>442</span>      * @param {Object} handlers
+<span class='line'>443</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>444</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>445</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>446</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>447</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>448</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>449</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>450</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>451</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>452</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>453</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>454</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>455</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>456</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>457</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>458</span>      *         &lt;/ul>
+<span class='line'>459</span>      * @returns {finesse.restservices.User}
+<span class='line'>460</span>      *     This User object to allow cascading
+<span class='line'>461</span>      */</span><span class="WHIT">
+<span class='line'>462</span> </span><span class="WHIT">    </span><span class="NAME">loginMobileAgent</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">extension</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">mode</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">dialNumber</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>463</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>464</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>465</span> </span><span class="WHIT">            </span><span class="STRN">"extension"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">extension</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>466</span> </span><span class="WHIT">            </span><span class="STRN">"mobileAgent"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>467</span> </span><span class="WHIT">                </span><span class="STRN">"mode"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">mode</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>468</span> </span><span class="WHIT">                </span><span class="STRN">"dialNumber"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">dialNumber</span><span class="WHIT">
+<span class='line'>469</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>470</span> </span><span class="WHIT">            </span><span class="STRN">"handlers"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="WHIT">
+<span class='line'>471</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>472</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._login</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>473</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>474</span> 
+<span class='line'>475</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>476</span>      * Perform an agent logout for this user.
+<span class='line'>477</span>      * @param {String} reasonCode
+<span class='line'>478</span>      *     The reason this user is logging out.  Pass null for no reason.
+<span class='line'>479</span>      * @param {Object} handlers
+<span class='line'>480</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>481</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>482</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>483</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>484</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>485</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>486</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>487</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>488</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>489</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>490</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>491</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>492</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>493</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>494</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>495</span>      *         &lt;/ul>
+<span class='line'>496</span>      * @returns {finesse.restservices.User}
+<span class='line'>497</span>      *     This User object to allow cascading
+<span class='line'>498</span>      */</span><span class="WHIT">
+<span class='line'>499</span> </span><span class="WHIT">    </span><span class="NAME">logout</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">reasonCode</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>500</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setState</span><span class="PUNC">(</span><span class="STRN">"LOGOUT"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">reasonCode</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>501</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>502</span> 
+<span class='line'>503</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>504</span>      * Set the state of the user.
+<span class='line'>505</span>      * @param {String} newState
+<span class='line'>506</span>      *     The state you are setting
+<span class='line'>507</span>      * @param {ReasonCode} reasonCode
+<span class='line'>508</span>      *     The reason this user is logging out.  Pass null for no reason.
+<span class='line'>509</span>      * @param {Object} handlers
+<span class='line'>510</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>511</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>512</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>513</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>514</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>515</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>516</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>517</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>518</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>519</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>520</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>521</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>522</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>523</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>524</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>525</span>      *         &lt;/ul>
+<span class='line'>526</span>      * @returns {finesse.restservices.User}
+<span class='line'>527</span>      *     This User object to allow cascading
+<span class='line'>528</span>      */</span><span class="WHIT">
+<span class='line'>529</span> </span><span class="WHIT">    </span><span class="NAME">setState</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">newState</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">reasonCode</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>530</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>531</span> 
+<span class='line'>532</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>533</span> 
+<span class='line'>534</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">reasonCode</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>535</span> </span><span class="WHIT">            </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>536</span> </span><span class="WHIT">                </span><span class="STRN">"state"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="WHIT">
+<span class='line'>537</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>538</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>539</span> </span><span class="WHIT">            </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>540</span> </span><span class="WHIT">                </span><span class="STRN">"state"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>541</span> </span><span class="WHIT">                </span><span class="STRN">"reasonCodeId"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">reasonCode.id</span><span class="WHIT">
+<span class='line'>542</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>543</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>544</span> 
+<span class='line'>545</span> </span><span class="WHIT">        </span><span class="COMM">// Protect against null dereferencing of options allowing its (nonexistant) keys to be read as undefined</span><span class="WHIT">
+<span class='line'>546</span> </span><span class="WHIT">        </span><span class="NAME">handlers</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>547</span> 
+<span class='line'>548</span> </span><span class="WHIT">        </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>549</span> </span><span class="WHIT">            </span><span class="NAME">method</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'PUT'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>550</span> </span><span class="WHIT">            </span><span class="NAME">success</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.success</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>551</span> </span><span class="WHIT">            </span><span class="NAME">error</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.error</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>552</span> </span><span class="WHIT">            </span><span class="NAME">content</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT">
+<span class='line'>553</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>554</span> 
+<span class='line'>555</span> </span><span class="WHIT">        </span><span class="COMM">// After removing the selective 202 handling, we should be able to just use restRequest</span><span class="WHIT">
+<span class='line'>556</span> </span><span class="WHIT">        </span><span class="NAME">this.restRequest</span><span class="PUNC">(</span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>557</span> 
+<span class='line'>558</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>559</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>560</span> 
+<span class='line'>561</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>562</span>      * Make call to a particular phone number.
+<span class='line'>563</span>      *
+<span class='line'>564</span>      * @param {String} The number to call
+<span class='line'>565</span>      * @param {Object} handlers
+<span class='line'>566</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>567</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>568</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>569</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>570</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>571</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>572</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>573</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>574</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>575</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>576</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>577</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>578</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>579</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>580</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>581</span>      *         &lt;/ul>
+<span class='line'>582</span>      */</span><span class="WHIT">
+<span class='line'>583</span> </span><span class="WHIT">    </span><span class="NAME">makeCall</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">number</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>584</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>585</span> 
+<span class='line'>586</span> </span><span class="WHIT">        </span><span class="NAME">this.getDialogs</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">createNewCallDialog</span><span class="PUNC">(</span><span class="NAME">number</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.getExtension</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>587</span> 
+<span class='line'>588</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>589</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>590</span> 
+<span class='line'>591</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>592</span>      * Make a silent monitor call to a particular agent's phone number.
+<span class='line'>593</span>      *
+<span class='line'>594</span>      * @param number to call
+<span class='line'>595</span>      * @param {Object} handlers
+<span class='line'>596</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>597</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>598</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>599</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>600</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>601</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>602</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>603</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>604</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>605</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>606</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>607</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>608</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>609</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>610</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>611</span>      *         &lt;/ul>
+<span class='line'>612</span>      */</span><span class="WHIT">
+<span class='line'>613</span> </span><span class="WHIT">    </span><span class="NAME">makeSMCall</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">number</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>614</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>615</span> 
+<span class='line'>616</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">actionType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"SILENT_MONITOR"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>617</span> 
+<span class='line'>618</span> </span><span class="WHIT">        </span><span class="NAME">this.getDialogs</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">createNewSuperviseCallDialog</span><span class="PUNC">(</span><span class="NAME">number</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.getExtension</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">actionType</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>619</span> 
+<span class='line'>620</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>621</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>622</span> </span><span class="WHIT">    
+<span class='line'>623</span> 
+<span class='line'>624</span>     </span><span class="COMM">/**
+<span class='line'>625</span>      * Make a silent monitor call to a particular agent's phone number.
+<span class='line'>626</span>      *
+<span class='line'>627</span>      * @param number to call
+<span class='line'>628</span>      * @param {String} dialogUri
+<span class='line'>629</span>      *     The associated uri of SUPERVISOR_MONITOR call
+<span class='line'>630</span>      * @param {Object} handlers
+<span class='line'>631</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>632</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>633</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>634</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>635</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>636</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>637</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>638</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>639</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>640</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>641</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>642</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>643</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>644</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>645</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>646</span>      *         &lt;/ul>
+<span class='line'>647</span>      */</span><span class="WHIT">
+<span class='line'>648</span> </span><span class="WHIT">    </span><span class="NAME">makeBargeCall</span><span class="PUNC">:</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">number</span><span class="PUNC">,</span><span class="NAME">dialogURI</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>649</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>650</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">actionType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"BARGE_CALL"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>651</span> </span><span class="WHIT">        </span><span class="NAME">this.getDialogs</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">createNewBargeCall</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.getExtension</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">number</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">actionType</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">dialogURI</span><span class="PUNC">,</span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>652</span> 
+<span class='line'>653</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>654</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>655</span> </span><span class="WHIT">    
+<span class='line'>656</span>     </span><span class="COMM">/**
+<span class='line'>657</span>      * Returns true if the user's current state will result in a pending state change. A pending state
+<span class='line'>658</span>      * change is a request to change state that does not result in an immediate state change. For
+<span class='line'>659</span>      * example if an agent attempts to change to the NOT_READY state while in the TALKING state, the
+<span class='line'>660</span>      * agent will not change state until the call ends.
+<span class='line'>661</span>      *
+<span class='line'>662</span>      * The current set of states that result in pending state changes is as follows:
+<span class='line'>663</span>      *     TALKING
+<span class='line'>664</span>      *     HOLD
+<span class='line'>665</span>      *     RESERVED_OUTBOUND_PREVIEW
+<span class='line'>666</span>      */</span><span class="WHIT">
+<span class='line'>667</span> </span><span class="WHIT">    </span><span class="NAME">isPendingStateChange</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>668</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getState</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>669</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">state</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">state</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.User.States.TALKING</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">state</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.User.States.HOLD</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">state</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.User.States.RESERVED_OUTBOUND_PREVIEW</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>670</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>671</span> 
+<span class='line'>672</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>673</span>      * Parses a uriString to retrieve the id portion
+<span class='line'>674</span>      * @param {String} uriString
+<span class='line'>675</span>      * @return {String} id
+<span class='line'>676</span>      */</span><span class="WHIT">
+<span class='line'>677</span> </span><span class="WHIT">    </span><span class="NAME">_parseIdFromUriString</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">uriString</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>678</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities.getId</span><span class="PUNC">(</span><span class="NAME">uriString</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>679</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>680</span> 
+<span class='line'>681</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>682</span>      * Gets the user's Not Ready reason code.
+<span class='line'>683</span>      * @return undefined if not set or indeterminate
+<span class='line'>684</span>      */</span><span class="WHIT">
+<span class='line'>685</span> </span><span class="WHIT">    </span><span class="NAME">getNotReadyReasonCodeId</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>686</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>687</span> 
+<span class='line'>688</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">reasoncodeIdResult</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">finesseServerReasonCodeId</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>689</span> </span><span class="WHIT">        </span><span class="NAME">finesseServerReasonCodeId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">reasonCodeId</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>690</span> 
+<span class='line'>691</span> </span><span class="WHIT">        </span><span class="COMM">//FinesseServer will give "-l" => we will set to undefined (for convenience)</span><span class="WHIT">
+<span class='line'>692</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">finesseServerReasonCodeId</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">"-1"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>693</span> </span><span class="WHIT">            </span><span class="NAME">reasoncodeIdResult</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesseServerReasonCodeId</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>694</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>695</span> 
+<span class='line'>696</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">reasoncodeIdResult</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>697</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>698</span> 
+<span class='line'>699</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>700</span>      * Performs a GET against the Finesse server looking up the reasonCodeId specified.
+<span class='line'>701</span>      * @param {Object} handlers
+<span class='line'>702</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>703</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>704</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>705</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>706</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>707</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>708</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>709</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>710</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>711</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>712</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>713</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>714</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>715</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>716</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>717</span>      *         &lt;/ul>
+<span class='line'>718</span>      * @param {String} reasonCodeId is the id for the reason code to lookup
+<span class='line'>719</span>      */</span><span class="WHIT">
+<span class='line'>720</span> </span><span class="WHIT">    </span><span class="NAME">getReasonCodeById</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handlers</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">reasonCodeId</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>721</span> </span><span class="WHIT">    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>722</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">reasonCode</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">url</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>723</span> </span><span class="WHIT">        </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>724</span> 
+<span class='line'>725</span> </span><span class="WHIT">        </span><span class="NAME">url</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"/ReasonCode/"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">reasonCodeId</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>726</span> </span><span class="WHIT">        </span><span class="NAME">this.restRequest</span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>727</span> </span><span class="WHIT">            </span><span class="NAME">method</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'GET'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>728</span> </span><span class="WHIT">            </span><span class="NAME">success</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>729</span> </span><span class="WHIT">                </span><span class="NAME">reasonCode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>730</span> </span><span class="WHIT">                    </span><span class="NAME">uri</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">rsp.object.ReasonCode.uri</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>731</span> </span><span class="WHIT">                    </span><span class="NAME">label</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">rsp.object.ReasonCode.label</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>732</span> </span><span class="WHIT">                    </span><span class="NAME">id</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">self._parseIdFromUriString</span><span class="PUNC">(</span><span class="NAME">rsp.object.ReasonCode.uri</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>733</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>734</span> </span><span class="WHIT">                </span><span class="NAME">handlers.success</span><span class="PUNC">(</span><span class="NAME">reasonCode</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>735</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>736</span> </span><span class="WHIT">            </span><span class="NAME">error</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>737</span> </span><span class="WHIT">                </span><span class="NAME">handlers.error</span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>738</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>739</span> </span><span class="WHIT">            </span><span class="NAME">content</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT">
+<span class='line'>740</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>741</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>742</span> 
+<span class='line'>743</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>744</span>      * Performs a GET against Finesse server retrieving all the specified type of reason codes.
+<span class='line'>745</span>      * @param {String} type (LOGOUT or NOT_READY)
+<span class='line'>746</span>      * @param {Object} handlers
+<span class='line'>747</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>748</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>749</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>750</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>751</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>752</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>753</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>754</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>755</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>756</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>757</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>758</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>759</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>760</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>761</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>762</span>      *         &lt;/ul>
+<span class='line'>763</span>      */</span><span class="WHIT">
+<span class='line'>764</span> </span><span class="WHIT">    </span><span class="NAME">_getReasonCodesByType</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>765</span> </span><span class="WHIT">    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>766</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">reasonCodes</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">reasonCodeArray</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>767</span> 
+<span class='line'>768</span> </span><span class="WHIT">        </span><span class="NAME">url</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"/ReasonCodes?category="</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">type</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>769</span> </span><span class="WHIT">        </span><span class="NAME">this.restRequest</span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>770</span> </span><span class="WHIT">            </span><span class="NAME">method</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'GET'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>771</span> </span><span class="WHIT">            </span><span class="NAME">success</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>772</span> </span><span class="WHIT">                </span><span class="NAME">reasonCodes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>773</span> 
+<span class='line'>774</span> </span><span class="WHIT">                </span><span class="NAME">reasonCodeArray</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rsp.object.ReasonCodes.ReasonCode</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>775</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">reasonCodeArray</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>776</span> </span><span class="WHIT">                    </span><span class="NAME">reasonCodes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>777</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">reasonCodeArray</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>778</span> </span><span class="WHIT">                    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">reasonCodeArray.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>779</span> </span><span class="WHIT">                        </span><span class="NAME">reasonCodes</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>780</span> </span><span class="WHIT">                            </span><span class="NAME">label</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">rsp.object.ReasonCodes.ReasonCode</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">label</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>781</span> </span><span class="WHIT">                            </span><span class="NAME">id</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">self._parseIdFromUriString</span><span class="PUNC">(</span><span class="NAME">rsp.object.ReasonCodes.ReasonCode</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">uri</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>782</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>783</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>784</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>785</span> </span><span class="WHIT">                    </span><span class="NAME">reasonCodes</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>786</span> </span><span class="WHIT">                        </span><span class="NAME">label</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">rsp.object.ReasonCodes.ReasonCode.label</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>787</span> </span><span class="WHIT">                        </span><span class="NAME">id</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">self._parseIdFromUriString</span><span class="PUNC">(</span><span class="NAME">rsp.object.ReasonCodes.ReasonCode.uri</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>788</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>789</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>790</span> </span><span class="WHIT">                </span><span class="NAME">handlers.success</span><span class="PUNC">(</span><span class="NAME">reasonCodes</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>791</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>792</span> </span><span class="WHIT">            </span><span class="NAME">error</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>793</span> </span><span class="WHIT">                </span><span class="NAME">handlers.error</span><span class="PUNC">(</span><span class="NAME">rsp</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>794</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>795</span> </span><span class="WHIT">            </span><span class="NAME">content</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT">
+<span class='line'>796</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>797</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>798</span> 
+<span class='line'>799</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>800</span>      * Performs a GET against Finesse server retrieving all the Signout reason codes.
+<span class='line'>801</span>      * @param {Object} handlers
+<span class='line'>802</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>803</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>804</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>805</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>806</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>807</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>808</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>809</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>810</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>811</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>812</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>813</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>814</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>815</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>816</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>817</span>      *         &lt;/ul>
+<span class='line'>818</span>      */</span><span class="WHIT">
+<span class='line'>819</span> </span><span class="WHIT">    </span><span class="NAME">getSignoutReasonCodes</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>820</span> </span><span class="WHIT">    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>821</span> </span><span class="WHIT">        </span><span class="NAME">this._getReasonCodesByType</span><span class="PUNC">(</span><span class="STRN">"LOGOUT"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>822</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>823</span> 
+<span class='line'>824</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>825</span>      * Performs a GET against Finesse server retrieving all the Not Ready reason codes.
+<span class='line'>826</span>      * @param {Object} handlers
+<span class='line'>827</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>828</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>829</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>830</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>831</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>832</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>833</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>834</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>835</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>836</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>837</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>838</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>839</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>840</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>841</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>842</span>      *         &lt;/ul>
+<span class='line'>843</span>      */</span><span class="WHIT">
+<span class='line'>844</span> </span><span class="WHIT">    </span><span class="NAME">getNotReadyReasonCodes</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>845</span> </span><span class="WHIT">    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>846</span> </span><span class="WHIT">        </span><span class="NAME">this._getReasonCodesByType</span><span class="PUNC">(</span><span class="STRN">"NOT_READY"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>847</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>848</span> 
+<span class='line'>849</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>850</span> 
+<span class='line'>851</span> </span><span class="COMM">/**
+<span class='line'>852</span>  * State constants
+<span class='line'>853</span>  */</span><span class="WHIT">
+<span class='line'>854</span> </span><span class="NAME">finesse.restservices.User.States</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>855</span> </span><span class="WHIT">    </span><span class="NAME">LOGIN</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"LOGIN"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>856</span> </span><span class="WHIT">    </span><span class="NAME">LOGOUT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"LOGOUT"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>857</span> </span><span class="WHIT">    </span><span class="NAME">NOT_READY</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"NOT_READY"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>858</span> </span><span class="WHIT">    </span><span class="NAME">READY</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"READY"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>859</span> </span><span class="WHIT">    </span><span class="NAME">RESERVED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"RESERVED"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>860</span> </span><span class="WHIT">    </span><span class="NAME">RESERVED_OUTBOUND</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"RESERVED_OUTBOUND"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>861</span> </span><span class="WHIT">    </span><span class="NAME">RESERVED_OUTBOUND_PREVIEW</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"RESERVED_OUTBOUND_PREVIEW"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>862</span> </span><span class="WHIT">    </span><span class="NAME">TALKING</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"TALKING"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>863</span> </span><span class="WHIT">    </span><span class="NAME">HOLD</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"HOLD"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>864</span> </span><span class="WHIT">    </span><span class="NAME">WORK</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"WORK"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>865</span> </span><span class="WHIT">    </span><span class="NAME">WORK_READY</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"WORK_READY"</span><span class="WHIT">
+<span class='line'>866</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>867</span> 
+<span class='line'>868</span> </span><span class="COMM">/**
+<span class='line'>869</span>  * Mobile agent/supervisor work modes.
+<span class='line'>870</span>  */</span><span class="WHIT">
+<span class='line'>871</span> </span><span class="NAME">finesse.restservices.User.WorkMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>872</span> </span><span class="WHIT">    </span><span class="NAME">CALL_BY_CALL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"CALL_BY_CALL"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>873</span> </span><span class="WHIT">    </span><span class="NAME">NAILED_CONNECTION</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"NAILED_CONNECTION"</span><span class="WHIT">
+<span class='line'>874</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>875</span> </span></pre></body></html>

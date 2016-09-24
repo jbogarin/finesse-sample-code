@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+
+<ModulePrefs title="ThickClientScreenpop Gadget"
+        description="ThickClientScreenpop Gadget">
+
+    <Require feature="settitle" />
+    <Require feature="dynamic-height" />
+    <Require feature="pubsub-2" />
+	<Require feature="setprefs" />
+>
+	
+
+</ModulePrefs>
+
+<Content type="html">
+<![CDATA[
+	<!-- Styling -->
+    <link rel="stylesheet" href="ThickClientScreenPop.css" type="text/css" />
+
+    <!-- jQuery 1.5 -->
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+	
+    
+    <!-- Finesse Library -->
+    <script type="text/javascript" src="finesse-10.0.1.js"></script>
+
+    <!-- Gadget Business Logic -->
+    <script type="text/javascript" src="ThickClientScreenPop.js"></script>
+	
+	 
+
+    <body class="cisco">
+	<div id="path"></div>
+	 <APPLET CODE="JavaScreenPopApplet.class" codebase="http://10.88.194.158:8080/userContent/ThickClientScreenPop" archive="JavaScreenPop.jar" NAME="JavaScreenPopApplet" WIDTH=350 HEIGHT=100 >
+    </APPLET >
+	
+   
+   
+
+
+    <!-- sample gadget html only has 1 div which will be modified during the screenpop -->
+     <div id="tabsout" >
+	    
+	</div>
+        <div id="agentout">
+	    </div>
+ 	  
+    </body>
+
+    <script type="text/javascript">
+
+    // initialize the gadget running the init handler defined in screenpop.js
+    gadgets.HubSettings.onConnect = function () {
+        finesse.modules.SampleGadget.init();
+    
+    };
+	gadgets.window.adjustHeight();
+
+    </script>
+]]>
+</Content>
+</Module>

@@ -1,0 +1,352 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview Exposes a set of API wrappers that will hide the dirty work of
+<span class='line'>  3</span>  *     constructing Finesse API requests and consuming Finesse events.
+<span class='line'>  4</span>  *
+<span class='line'>  5</span>  * @name finesse.containerservices.ContainerServices
+<span class='line'>  6</span>  * @requires OpenAjax, jQuery 1.5, finesse.utilities.Utilities
+<span class='line'>  7</span>  */</span><span class="WHIT">
+<span class='line'>  8</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  9</span> </span><span class="NAME">finesse.containerservices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.containerservices</span><span class="WHIT">  </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 10</span> </span><span class="COMM">/**
+<span class='line'> 11</span>  * @class
+<span class='line'> 12</span>  * Provide container level services for gadget developers, exposing container events by
+<span class='line'> 13</span>  * calling a set of exposed functions. Gadgets can utilize the container dialogs and 
+<span class='line'> 14</span>  * event handling (add/remove)
+<span class='line'> 15</span>  */</span><span class="WHIT">
+<span class='line'> 16</span> </span><span class="NAME">finesse.containerservices.ContainerServices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 17</span> 
+<span class='line'> 18</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT">
+<span class='line'> 19</span> 
+<span class='line'> 20</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 21</span>      * Shortcut reference to the finesse.utilities.Utilities singleton
+<span class='line'> 22</span>      * This will be set by init()
+<span class='line'> 23</span>      * @private
+<span class='line'> 24</span>      */</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">_util</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 26</span> 
+<span class='line'> 27</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 28</span>      * Shortcut reference to the gadget pubsub Hub instance.
+<span class='line'> 29</span>      * This will be set by init()
+<span class='line'> 30</span>      * @private
+<span class='line'> 31</span>      */</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">    </span><span class="NAME">_hub</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 33</span> 
+<span class='line'> 34</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 35</span>      * @private
+<span class='line'> 36</span>      * Whether the Client Services have been initiated yet.
+<span class='line'> 37</span>      */</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">    </span><span class="NAME">_inited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">    
+<span class='line'> 40</span>      </span><span class="COMM">/**
+<span class='line'> 41</span>      * Stores the list of subscription IDs for all subscriptions so that it
+<span class='line'> 42</span>      * could be retrieve for unsubscriptions.
+<span class='line'> 43</span>      * @private
+<span class='line'> 44</span>      */</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="NAME">_subscriptionID</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">    
+<span class='line'> 47</span>     </span><span class="COMM">/**
+<span class='line'> 48</span>      * @private
+<span class='line'> 49</span>      * Reference to the gadget's parent container
+<span class='line'> 50</span>      */</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">    </span><span class="NAME">_parent</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    
+<span class='line'> 53</span>     </span><span class="COMM">/**
+<span class='line'> 54</span>      * @private
+<span class='line'> 55</span>      * Reference to the gadget's parent container
+<span class='line'> 56</span>      */</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">    </span><span class="NAME">_tabVisibleNotifier</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">    
+<span class='line'> 59</span>     </span><span class="COMM">/**
+<span class='line'> 60</span>      * @private
+<span class='line'> 61</span>      * Reference to the gadget's prefs object
+<span class='line'> 62</span>      */</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="NAME">_prefs</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    
+<span class='line'> 65</span>     </span><span class="COMM">/**
+<span class='line'> 66</span>      * @private
+<span class='line'> 67</span>      * Reference to the tabId that is associated with the gadget
+<span class='line'> 68</span>      */</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="NAME">_myTab</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">    
+<span class='line'> 71</span>     </span><span class="COMM">/**
+<span class='line'> 72</span>      * @private
+<span class='line'> 73</span>      * Reference to the visibility of current gadget
+<span class='line'> 74</span>      */</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">    </span><span class="NAME">_visible</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">    
+<span class='line'> 77</span>     </span><span class="COMM">/**
+<span class='line'> 78</span>      * Shortcut reference to the Topics class.
+<span class='line'> 79</span>      * This will be set by init()
+<span class='line'> 80</span>      * @private
+<span class='line'> 81</span>      */</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">    </span><span class="NAME">_topics</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 83</span> 
+<span class='line'> 84</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 85</span>      * Ensure that ClientServices have been inited.
+<span class='line'> 86</span>      * @private
+<span class='line'> 87</span>      */</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="NAME">_isInited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_inited</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"ContainerServices needs to be inited."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">   </span><span class="COMM">/**
+<span class='line'> 94</span>      * Retrieves a reference to a particular notifierType.
+<span class='line'> 95</span>      * @param {String} notifierType
+<span class='line'> 96</span>      *      Specifies the notifier to retrieve (tabVisible: when the parent tab becomes visible)
+<span class='line'> 97</span>      * @return {Notifier} The notifier object.
+<span class='line'> 98</span>      */</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">    </span><span class="NAME">_getNotifierReference</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">notifierType</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">notifierReference</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">notifierType</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'tabVisible'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">            </span><span class="NAME">notifierReference</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_tabVisibleNotifier</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">  </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"_getNotifierReference(): Trying to get unknown notifier(notifierType="</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">notifierType</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">")"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">notifierReference</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>109</span>          * @private
+<span class='line'>110</span>          * Utility function to make a subscription to a particular topic. Only one
+<span class='line'>111</span>          * callback function is registered to a particular topic at any time.
+<span class='line'>112</span>          * @param {String} topic
+<span class='line'>113</span>          *     The full topic name. The topic name should follow the OpenAjax
+<span class='line'>114</span>          *     convention using dot notation (ex: finesse.api.User.1000).
+<span class='line'>115</span>          * @param {Function} callback
+<span class='line'>116</span>          *     The function that should be invoked with the data when an event
+<span class='line'>117</span>          *     is delivered to the specific topic.
+<span class='line'>118</span>          * @returns {Boolean}
+<span class='line'>119</span>          *     True if the subscription was made successfully and the callback was
+<span class='line'>120</span>          *     been registered. False if the subscription already exist, the
+<span class='line'>121</span>          *     callback was not overwritten.
+<span class='line'>122</span>          */</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">        </span><span class="NAME">_subscribe</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">            </span><span class="NAME">_isInited</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> 
+<span class='line'>126</span> </span><span class="WHIT">            </span><span class="COMM">//Ensure that the same subscription isn't made twice.</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">                </span><span class="COMM">//Store the subscription ID using the topic name as the key.</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">                </span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_hub.subscribe</span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">                    </span><span class="COMM">//Invoke the callback just with the data object.</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">                        </span><span class="NAME">callback</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>138</span> 
+<span class='line'>139</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>140</span>          * @private
+<span class='line'>141</span>          * Unsubscribe from a particular topic.
+<span class='line'>142</span>          * @param {String} topic
+<span class='line'>143</span>          *     The full topic name.
+<span class='line'>144</span>          */</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">        </span><span class="NAME">_unsubscribe</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">topic</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">            </span><span class="NAME">_isInited</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> 
+<span class='line'>148</span> </span><span class="WHIT">            </span><span class="COMM">//Unsubscribe from the topic using the subscription ID recorded when</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">            </span><span class="COMM">//the subscription was made, then delete the ID from data structure.</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">            </span><span class="NAME">_hub.unsubscribe</span><span class="PUNC">(</span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="WHIT">            </span><span class="KEYW">delete</span><span class="WHIT"> </span><span class="NAME">_subscriptionID</span><span class="PUNC">[</span><span class="NAME">topic</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>152</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">        
+<span class='line'>154</span>         </span><span class="NAME">_tabTracker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">tabId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">tabId</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">_myTab</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_visible</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">                    </span><span class="NAME">_visible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">                    </span><span class="NAME">_tabVisibleNotifier.notifyListeners</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>161</span> </span><span class="WHIT">                </span><span class="NAME">_visible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>164</span> 
+<span class='line'>165</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>167</span>          * Shows the jQuery UI Dialog with the specified parameters and the
+<span class='line'>168</span>          * following defaults:
+<span class='line'>169</span>          *     - The only button "Ok" closes the dialog
+<span class='line'>170</span>          *     - Modal
+<span class='line'>171</span>          *     - Not draggable
+<span class='line'>172</span>          *     - Fixed size
+<span class='line'>173</span>          * @param {Object} options
+<span class='line'>174</span>          *     An object containing additional options for the dialog.
+<span class='line'>175</span>          * @param {String/Boolean} options.title
+<span class='line'>176</span>          *     Title to use. undefined defaults to "Cisco Finesse".
+<span class='line'>177</span>          *     false to hide
+<span class='line'>178</span>          * @param {Function} options.close
+<span class='line'>179</span>          *     A function to invoke when the dialog is closed.
+<span class='line'>180</span>          * @param {String} options.message
+<span class='line'>181</span>          *     The message to display in the dialog.
+<span class='line'>182</span>          *     Defaults to "A generic error has occurred."
+<span class='line'>183</span>          * @param {Boolean} options.isBlocking
+<span class='line'>184</span>          *     Flag indicating whether this dialog will block other
+<span class='line'>185</span>          *     dialogs from being shown.
+<span class='line'>186</span>          * @returns {jQuery}
+<span class='line'>187</span>          *     jQuery wrapped object of the dialog DOM element
+<span class='line'>188</span>          */</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">        </span><span class="NAME">showDialog</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">_parent.showDialog</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_parent.showDialog</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">this.showDialog</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_parent.showDialog</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">        
+<span class='line'>195</span>         </span><span class="COMM">/**
+<span class='line'>196</span>          * Hides the jQuery UI Dialog
+<span class='line'>197</span>          * @returns {jQuery}
+<span class='line'>198</span>          *     jQuery wrapped object of the dialog DOM element
+<span class='line'>199</span>          */</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">        </span><span class="NAME">hideDialog</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">_parent.hideDialog</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_parent.hideDialog</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">this.hideDialog</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="WHIT">                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_parent.hideDialog</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">        
+<span class='line'>206</span>         </span><span class="COMM">/**
+<span class='line'>207</span>      * Adds an handler to this object.
+<span class='line'>208</span>      * @param {String} notifierType
+<span class='line'>209</span>      *     The type of notifier to add to ('tabVisible')
+<span class='line'>210</span>      * @param {Function} callback
+<span class='line'>211</span>      *     The function callback to invoke.
+<span class='line'>212</span>      */</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">        </span><span class="NAME">addHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">notifierType</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="WHIT">          </span><span class="NAME">_isInited</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="WHIT">          </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">notifier</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>216</span> </span><span class="WHIT">        </span><span class="KEYW">try</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">            </span><span class="NAME">_util.validateHandler</span><span class="PUNC">(</span><span class="NAME">callback</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>218</span> 
+<span class='line'>219</span> </span><span class="WHIT">            </span><span class="NAME">notifier</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_getNotifierReference</span><span class="PUNC">(</span><span class="NAME">notifierType</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>220</span> 
+<span class='line'>221</span> </span><span class="WHIT">            </span><span class="NAME">notifier.addListener</span><span class="PUNC">(</span><span class="NAME">callback</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>222</span> </span><span class="WHIT">            
+<span class='line'>223</span>         </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">catch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"addHandler(): "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">err</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>226</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>227</span>         
+<span class='line'>228</span>         </span><span class="COMM">/**
+<span class='line'>229</span>      * Removes a handler from this object.
+<span class='line'>230</span>      * @param {String} notifierType
+<span class='line'>231</span>      *     The type of notifier to remove ('tabVisible')
+<span class='line'>232</span>      * @param {Function} callback
+<span class='line'>233</span>      *     The function to remove.
+<span class='line'>234</span>      */</span><span class="WHIT">
+<span class='line'>235</span> </span><span class="WHIT">        </span><span class="NAME">removeHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">notifierType</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">notifier</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>237</span> </span><span class="WHIT">        </span><span class="KEYW">try</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">            </span><span class="NAME">_util.validateHandler</span><span class="PUNC">(</span><span class="NAME">callback</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>239</span> 
+<span class='line'>240</span> </span><span class="WHIT">            </span><span class="NAME">notifier</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_getNotifierReference</span><span class="PUNC">(</span><span class="NAME">notifierType</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>241</span> 
+<span class='line'>242</span> </span><span class="WHIT">            </span><span class="NAME">notifier.removeListener</span><span class="PUNC">(</span><span class="NAME">callback</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">catch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>244</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"removeHandler(): "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">err</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>246</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>247</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>248</span>          * Returns the visibility of current gadget
+<span class='line'>249</span>          * @return {Boolean} 
+<span class='line'>250</span>          *         The visibility of current gadget
+<span class='line'>251</span>          */</span><span class="WHIT">
+<span class='line'>252</span> </span><span class="WHIT">        </span><span class="NAME">tabVisible</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>253</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_visible</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>254</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>255</span> </span><span class="WHIT">        
+<span class='line'>256</span>          </span><span class="COMM">/**
+<span class='line'>257</span>          * Make a request to the check the current tab
+<span class='line'>258</span>          */</span><span class="WHIT">
+<span class='line'>259</span> </span><span class="WHIT">        </span><span class="NAME">makeActiveTabReq</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>260</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">_hub</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>261</span> </span><span class="WHIT">                </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>262</span> </span><span class="WHIT">                    </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ActiveTabReq"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>263</span> </span><span class="WHIT">                    </span><span class="NAME">data</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="WHIT">                    </span><span class="NAME">invokeID</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">          
+<span class='line'>265</span>                 </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="WHIT">                </span><span class="NAME">_hub.publish</span><span class="PUNC">(</span><span class="NAME">_topics.REQUESTS</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>268</span> </span><span class="WHIT">                </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"Hub is not defined."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>269</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>270</span> </span><span class="WHIT">            
+<span class='line'>271</span>         </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>272</span> 
+<span class='line'>273</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>274</span>          * Initiates the Container Services.
+<span class='line'>275</span>          * @return {Object} 
+<span class='line'>276</span>          *         The ContainerServices instance
+<span class='line'>277</span>          */</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="WHIT">        </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>279</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">_inited</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>280</span> </span><span class="WHIT">                </span><span class="COMM">// Set shortcuts</span><span class="WHIT">
+<span class='line'>281</span> </span><span class="WHIT">                </span><span class="NAME">_util</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>282</span> </span><span class="WHIT">                </span><span class="NAME">_parent</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">parent.finesse.container.Container</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="WHIT">                </span><span class="NAME">_prefs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">gadgets.Prefs</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>284</span> </span><span class="WHIT">                </span><span class="NAME">_myTab</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_prefs.getString</span><span class="PUNC">(</span><span class="STRN">"tabId"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="WHIT">                </span><span class="NAME">_tabVisibleNotifier</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Notifier</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">                </span><span class="NAME">_inited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">                </span><span class="COMM">//init the hub only when it's available</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">gadgets.Hub</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="WHIT">                    </span><span class="NAME">_hub</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">gadgets.Hub</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="WHIT">                    </span><span class="NAME">_subscribe</span><span class="PUNC">(</span><span class="STRN">"finesse.containerservices.activeTab"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_tabTracker</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">finesse.containerservices.Topics</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">                    </span><span class="NAME">_topics</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.containerservices.Topics</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>295</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">finesse.containerservices.MasterPublisher</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>296</span> </span><span class="WHIT">                   </span><span class="NAME">publisher</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.containerservices.MasterPublisher</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>298</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>299</span> 
+<span class='line'>300</span> </span><span class="WHIT">            </span><span class="COMM">//Return the CS object for object chaining.</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>303</span> 
+<span class='line'>304</span> </span><span class="WHIT">        
+<span class='line'>305</span> 
+<span class='line'>306</span>         </span><span class="COMM">//BEGIN TEST CODE//</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>308</span>          * Test code added to expose private functions that are used by unit test
+<span class='line'>309</span>          * framework. This section of code is removed during the build process
+<span class='line'>310</span>          * before packaging production code. The [begin|end]TestSection are used
+<span class='line'>311</span>          * by the build to identify the section to strip.
+<span class='line'>312</span>          * @ignore
+<span class='line'>313</span>          */</span><span class="WHIT">
+<span class='line'>314</span> </span><span class="WHIT">        </span><span class="NAME">beginTestSection</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>315</span> 
+<span class='line'>316</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>317</span>          * @ignore
+<span class='line'>318</span>          */</span><span class="WHIT">
+<span class='line'>319</span> </span><span class="WHIT">        </span><span class="NAME">getTestObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>320</span> </span><span class="WHIT">            </span><span class="COMM">//Load mock dependencies.</span><span class="WHIT">
+<span class='line'>321</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_mock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">MockControl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="WHIT">            </span><span class="NAME">_util</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_mock.createMock</span><span class="PUNC">(</span><span class="NAME">finesse.utilities.Utilities</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">            </span><span class="NAME">_hub</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_mock.createMock</span><span class="PUNC">(</span><span class="NAME">gadgets.Hub</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">            </span><span class="NAME">_inited</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">            </span><span class="NAME">_tabVisibleNotifier</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Notifier</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>327</span> </span><span class="WHIT">                </span><span class="COMM">//Expose mock dependencies</span><span class="WHIT">
+<span class='line'>328</span> </span><span class="WHIT">                </span><span class="NAME">mock</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_mock</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>329</span> </span><span class="WHIT">                </span><span class="NAME">hub</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_hub</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>330</span> </span><span class="WHIT">                </span><span class="NAME">util</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_util</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>331</span> </span><span class="WHIT">                </span><span class="NAME">tabVisibleNotifier</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_tabVisibleNotifier</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">                </span><span class="NAME">addHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.addHandler</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>333</span>                 </span><span class="NAME">removeHandler</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.removeHandler</span><span class="WHIT">         
+<span class='line'>334</span>                 
+<span class='line'>335</span>             </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>336</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>337</span> 
+<span class='line'>338</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>339</span>          * @ignore
+<span class='line'>340</span>          */</span><span class="WHIT">
+<span class='line'>341</span> </span><span class="WHIT">       </span><span class="NAME">endTestSection</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT">
+<span class='line'>342</span> </span><span class="WHIT">        </span><span class="COMM">//END TEST CODE//</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="PUNC">}</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>345</span> </span></pre></body></html>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+
+<ModulePrefs title="Sample Gadget WebService"
+        description="Sample Gadget WebService">
+
+    <Require feature="settitle" />
+    <Require feature="dynamic-height" />
+    <Require feature="pubsub-2" />
+	<Require feature="setprefs" />
+</ModulePrefs>
+
+<Content type="html">
+<![CDATA[
+	<!DOCTYPE html>
+	<!-- Styling -->
+    <link rel="stylesheet" href="WebService.css" type="text/css" />
+
+    <!-- jQuery 1.5 -->
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+    
+    <!-- Finesse Library -->
+    <script type="text/javascript" src="finesse-10.5.1.js"></script>
+
+    <!-- Gadget Business Logic -->
+    <script type="text/javascript" src="WebService.js"></script>
+
+    <body>
+
+    <!-- sample gadget -->
+     <div>
+        <br>	
+		<fieldset id="hubfieldset">
+		<legend>WebService</legend>
+		    <button onClick="finesse.modules.SampleGadget.makeWebService();">Make Request</button>
+			<div>Text: <span id="result"></div>
+		</fieldset>
+   </div>
+    </body>
+
+    <script type="text/javascript">
+    gadgets.HubSettings.onConnect = function () {
+        finesse.modules.SampleGadget.init();
+    };
+
+    </script>
+]]>
+</Content>
+</Module>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+
+<ModulePrefs title="WorkflowScreenpop Gadget"
+        description="WorkflowScreenpop Gadget">
+
+    <Require feature="settitle" />
+    <Require feature="dynamic-height" />
+    <Require feature="pubsub-2" />
+	<Require feature="setprefs" />
+</ModulePrefs>
+
+<Content type="html">
+<![CDATA[
+	<!DOCTYPE html>
+	<!-- Styling -->
+	<link rel="stylesheet" href="bootstrap/2.3.2/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="WorkflowScreenPop.css" type="text/css" />
+
+    <!-- jQuery  -->
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+	
+	
+	<!-- Bootstrap see http://getbootstrap.com/2.3.2/javascript.html#tabs -->
+    <script type="text/javascript" src="bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    
+    <!-- Finesse Library -->
+    <script type="text/javascript" src="finesse-10.5.1.js"></script>
+
+    <!-- Gadget Business Logic -->
+    <script type="text/javascript" src="WorkflowScreenPop.js"></script>
+
+    <body class="cisco">
+
+    <!-- sample gadget html only has 1 div which will be modified during the screenpop -->
+     <div id="tabsout" >
+	    
+	</div>
+        <div id="agentout">
+	    </div>
+ 	  
+    </body>
+
+    <script type="text/javascript">
+
+    // initialize the gadget running the init handler defined in screenpop.js
+    gadgets.HubSettings.onConnect = function () {
+        finesse.modules.SampleGadget.init();
+    
+    };
+	gadgets.window.adjustHeight();
+
+    </script>
+]]>
+</Content>
+</Module>

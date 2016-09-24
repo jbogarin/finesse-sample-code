@@ -1,0 +1,240 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview JavaScript representation of the Finesse MediaPropertiesLayout object
+<span class='line'>  3</span>  *
+<span class='line'>  4</span>  * @name finesse.restservices.MediaPropertiesLayout
+<span class='line'>  5</span>  * @requires finesse.clientservices.ClientServices
+<span class='line'>  6</span>  * @requires Class
+<span class='line'>  7</span>  * @requires finesse.FinesseBase
+<span class='line'>  8</span>  * @requires finesse.restservices.RestBase
+<span class='line'>  9</span>  */</span><span class="WHIT">
+<span class='line'> 10</span> 
+<span class='line'> 11</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 13</span> 
+<span class='line'> 14</span> </span><span class="COMM">/** @private */</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="NAME">finesse.restservices.MediaPropertiesLayout</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.RestBase.extend</span><span class="PUNC">(</span><span class="COMM">/** @lends finesse.restservices.MediaPropertiesLayout.prototype */</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 16</span> 
+<span class='line'> 17</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 18</span>      * @class
+<span class='line'> 19</span>      * JavaScript representation of a MediaPropertiesLayout object. Also exposes
+<span class='line'> 20</span>      * methods to operate on the object against the server.
+<span class='line'> 21</span>      *
+<span class='line'> 22</span> 	 * @param {Object} options
+<span class='line'> 23</span> 	 *     An object with the following properties:&lt;ul>
+<span class='line'> 24</span>      *         &lt;li>&lt;b>id:&lt;/b> The id of the object being constructed&lt;/li>
+<span class='line'> 25</span>      *         &lt;li>&lt;b>onLoad(this): (optional)&lt;/b> when the object is successfully loaded from the server&lt;/li>
+<span class='line'> 26</span>      *         &lt;li>&lt;b>onChange(this): (optional)&lt;/b> when an update notification of the object is received&lt;/li>
+<span class='line'> 27</span>      *         &lt;li>&lt;b>onAdd(this): (optional)&lt;/b> when a notification that the object is created is received&lt;/li>
+<span class='line'> 28</span>      *         &lt;li>&lt;b>onDelete(this): (optional)&lt;/b> when a notification that the object is deleted is received&lt;/li>
+<span class='line'> 29</span>      *         &lt;li>&lt;b>onError(rsp): (optional)&lt;/b> if loading of the object fails, invoked with the error response object:&lt;ul>
+<span class='line'> 30</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'> 31</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'> 32</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>
+<span class='line'> 33</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'> 34</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'> 35</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'> 36</span>      *             &lt;/ul>&lt;/li>
+<span class='line'> 37</span>      *         &lt;/ul>&lt;/li>
+<span class='line'> 38</span>      *         &lt;li>&lt;b>parentObj: (optional)&lt;/b> The parent object&lt;/li>&lt;/ul>
+<span class='line'> 39</span>      * @constructs finesse.restservices.MediaPropertiesLayout
+<span class='line'> 40</span>      **/</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">    </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">        </span><span class="NAME">this._super</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 44</span> 
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 46</span>      * @private
+<span class='line'> 47</span>      * Gets the REST class for the current object - this is the MediaPropertiesLayout object.
+<span class='line'> 48</span>      */</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">    </span><span class="NAME">getRestClass</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.MediaPropertiesLayout</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 52</span> 
+<span class='line'> 53</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 54</span>      * @private
+<span class='line'> 55</span>      * Gets the REST type for the current object - this is a "MediaPropertiesLayout".
+<span class='line'> 56</span>      */</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">    </span><span class="NAME">getRestType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"MediaPropertiesLayout"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 60</span> 
+<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 62</span>      * @private
+<span class='line'> 63</span>      * Overrides the parent class.  Returns the url for the MediaPropertiesLayout resource
+<span class='line'> 64</span>      */</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="NAME">getRestUrl</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">"/finesse/api/User/"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.getId</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"/"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 68</span> 
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 70</span>      * @private
+<span class='line'> 71</span>      * Returns whether this object supports subscriptions
+<span class='line'> 72</span>      */</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="NAME">supportsSubscriptions</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 74</span> 
+<span class='line'> 75</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 76</span>      * Retrieve the media properties layout
+<span class='line'> 77</span>      * @returns {finesse.restservices.MediaPropertiesLayout}
+<span class='line'> 78</span>      *     This MediaPropertiesLayout object to allow cascading
+<span class='line'> 79</span>      */</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="NAME">get</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">        </span><span class="NAME">this._synchronize</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 82</span> 
+<span class='line'> 83</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//Allow cascading</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 85</span> 
+<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 87</span>      * Gets the data for this object.
+<span class='line'> 88</span>      * 
+<span class='line'> 89</span>      * Performs safe conversion from raw API data to ensure that the returned layout object
+<span class='line'> 90</span>      * always has a header with correct entry fields, and exactly two columns with lists of entries.
+<span class='line'> 91</span>      *
+<span class='line'> 92</span>      * @returns Object which are contained in data
+<span class='line'> 93</span>      */</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="NAME">getData</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 95</span> 
+<span class='line'> 96</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">layout</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">result</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">_addColumnData</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 97</span> 
+<span class='line'> 98</span> </span><span class="WHIT">        </span><span class="NAME">result</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getEmptyData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 99</span> 
+<span class='line'>100</span> </span><span class="WHIT">	    </span><span class="COMM">/**
+<span class='line'>101</span> 	     * @private
+<span class='line'>102</span> 	     */</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">        </span><span class="NAME">_addColumnData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">entryData</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">colIndex</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>104</span> 
+<span class='line'>105</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">entryData</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">                </span><span class="COMM">//If there's no entry data at all, rewrite entryData to be an empty collection of entries</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">                </span><span class="NAME">entryData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">entryData.mediaProperty</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">                </span><span class="COMM">//If entryData contains the keys for a single entry rather than being a collection of entries,</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">                </span><span class="COMM">//rewrite it to be a collection containing a single entry</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">                </span><span class="NAME">entryData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">entryData</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>113</span> 
+<span class='line'>114</span> </span><span class="WHIT">            </span><span class="COMM">//Add each of the entries in the list to the column</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">            </span><span class="NAME">jQuery.each</span><span class="PUNC">(</span><span class="NAME">entryData</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">entryData</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>116</span> 
+<span class='line'>117</span> </span><span class="WHIT">                </span><span class="COMM">//If the entry has no displayName specified, explicitly set it to the empty string</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">entryData.displayName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">                    </span><span class="NAME">entryData.displayName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>121</span> 
+<span class='line'>122</span> </span><span class="WHIT">                </span><span class="NAME">result.columns</span><span class="PUNC">[</span><span class="NAME">colIndex</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">push</span><span class="PUNC">(</span><span class="NAME">entryData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>123</span> 
+<span class='line'>124</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> 
+<span class='line'>126</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>127</span> 
+<span class='line'>128</span> </span><span class="WHIT">        </span><span class="COMM">//The header should only contain a single entry</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">layout.header</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">layout.header.entry</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>130</span> 
+<span class='line'>131</span> </span><span class="WHIT">            </span><span class="COMM">//If the entry has no displayName specified, explicitly set it to the empty string</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">layout.header.entry.displayName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">                </span><span class="NAME">layout.header.entry.displayName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>135</span> 
+<span class='line'>136</span> </span><span class="WHIT">            </span><span class="NAME">result.header</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">layout.header.entry</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> 
+<span class='line'>138</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>139</span> 
+<span class='line'>140</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">"MediaPropertiesLayout.getData() - Header does not contain an entry"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> 
+<span class='line'>142</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>143</span> 
+<span class='line'>144</span> </span><span class="WHIT">        </span><span class="COMM">//If the column object contains an entry object that wasn't part of a list of entries,</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">        </span><span class="COMM">//it must be a single right-hand entry object (left-hand entry object would be part of a list.)</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">        </span><span class="COMM">//Force the entry object to be the 2nd element in an otherwise-empty list.</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">layout.column</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">layout.column.entry</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">            </span><span class="NAME">layout.column</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">                </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="STRN">"entry"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">layout.column.entry</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="WHIT">            </span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>152</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>153</span> 
+<span class='line'>154</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">layout.column</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">layout.column.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">layout.column.length</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>155</span> 
+<span class='line'>156</span> </span><span class="WHIT">            </span><span class="COMM">//Render left column entries</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">layout.column</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">layout.column</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">entry</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">                </span><span class="NAME">_addColumnData</span><span class="PUNC">(</span><span class="NAME">layout.column</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">entry</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>160</span> 
+<span class='line'>161</span> </span><span class="WHIT">            </span><span class="COMM">//Render right column entries</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">layout.column</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">layout.column</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">entry</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">                </span><span class="NAME">_addColumnData</span><span class="PUNC">(</span><span class="NAME">layout.column</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">entry</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>165</span> 
+<span class='line'>166</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>167</span> 
+<span class='line'>168</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">result</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> 
+<span class='line'>170</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>171</span> 
+<span class='line'>172</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>173</span>      * Empty/template version of getData().
+<span class='line'>174</span>      *
+<span class='line'>175</span>      * Used by getData(), and by callers of getData() in error cases.
+<span class='line'>176</span>      */</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">    </span><span class="NAME">getEmptyData</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>178</span> 
+<span class='line'>179</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">            </span><span class="NAME">header</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">                </span><span class="NAME">displayName</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">                </span><span class="NAME">mediaProperty</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">            </span><span class="NAME">columns</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>186</span> 
+<span class='line'>187</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>188</span> 
+<span class='line'>189</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>190</span>      * Set the layout of this MediaPropertiesLayout.
+<span class='line'>191</span>      * @param {String} layout
+<span class='line'>192</span>      *     The layout you are setting
+<span class='line'>193</span>      * @param {Object} handlers
+<span class='line'>194</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>195</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>196</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>197</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>198</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>199</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>200</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>201</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>202</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>203</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>204</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>205</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>206</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>207</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>208</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>209</span>      *         &lt;/ul>
+<span class='line'>210</span>      * @returns {finesse.restservices.MediaPropertiesLayout}
+<span class='line'>211</span>      *     This MediaPropertiesLayout object to allow cascading
+<span class='line'>212</span>      */</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">    </span><span class="NAME">setLayout</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">layout</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>214</span> 
+<span class='line'>215</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>216</span> 
+<span class='line'>217</span> </span><span class="WHIT">        </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">layout</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>218</span> 
+<span class='line'>219</span> </span><span class="WHIT">        </span><span class="COMM">//Protect against null dereferencing of options allowing its (nonexistant) keys to be read as undefined</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">        </span><span class="NAME">handlers</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>221</span> 
+<span class='line'>222</span> </span><span class="WHIT">        </span><span class="NAME">this.restRequest</span><span class="PUNC">(</span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>223</span> </span><span class="WHIT">            </span><span class="NAME">method</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'PUT'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">            </span><span class="NAME">success</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.success</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">            </span><span class="NAME">error</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.error</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>226</span> </span><span class="WHIT">            </span><span class="NAME">content</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT">
+<span class='line'>227</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>228</span> 
+<span class='line'>229</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>231</span> 
+<span class='line'>232</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>233</span> </span></pre></body></html>

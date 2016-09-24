@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+
+<ModulePrefs title="Sample Gadget"
+        description="Sample Gadget"
+        thumbnail="http://localhost:8080/">
+
+    <Require feature="settitle" />
+    <Require feature="dynamic-height" />
+    <Require feature="pubsub-2" />
+</ModulePrefs>
+
+<Content type="html">
+<![CDATA[
+	<!-- Styling -->
+    <link rel="stylesheet" href="SampleGadget.css" type="text/css" />
+    
+    <!-- jQuery 1.5 -->
+    <script type="text/javascript" src="jquery-1.5.min.js"></script>
+    
+    <!-- Finesse Library -->
+    <script type="text/javascript" src="finesse.js"></script>
+
+    <!-- Gadget Business Logic -->
+    <script type="text/javascript" src="SampleGadget.js"></script>
+
+    <body class="claro">
+    </body>
+
+    <script type="text/javascript">
+        gadgets.HubSettings.onConnect = function () {
+        };
+    </script>
+]]>
+</Content>
+</Module>

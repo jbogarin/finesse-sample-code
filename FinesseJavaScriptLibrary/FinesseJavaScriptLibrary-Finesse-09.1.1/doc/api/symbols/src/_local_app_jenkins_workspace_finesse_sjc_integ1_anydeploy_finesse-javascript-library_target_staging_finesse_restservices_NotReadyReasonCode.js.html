@@ -1,0 +1,140 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview JavaScript representation of the Finesse Not Ready Reason Code object.
+<span class='line'>  3</span>  *
+<span class='line'>  4</span>  * @name finesse.restservices.NotReadyReasonCode
+<span class='line'>  5</span>  * @requires finesse.clientservices.ClientServices
+<span class='line'>  6</span>  * @requires Class
+<span class='line'>  7</span>  * @requires finesse.FinesseBase
+<span class='line'>  8</span>  * @requires finesse.restservices.RestBase
+<span class='line'>  9</span>  */</span><span class="WHIT">
+<span class='line'> 10</span> 
+<span class='line'> 11</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 13</span> 
+<span class='line'> 14</span> </span><span class="COMM">/** @private */</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="NAME">finesse.restservices.NotReadyReasonCode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.RestBase.extend</span><span class="PUNC">(</span><span class="COMM">/** @lends finesse.restservices.NotReadyReasonCode.prototype */</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 16</span> 
+<span class='line'> 17</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 18</span>      * @class
+<span class='line'> 19</span>      * JavaScript representation of a ReasonCode object. Also exposes
+<span class='line'> 20</span>      * methods to operate on the object against the server.
+<span class='line'> 21</span>      *
+<span class='line'> 22</span> 	 * @param {Object} options
+<span class='line'> 23</span> 	 *     An object with the following properties:&lt;ul>
+<span class='line'> 24</span>      *         &lt;li>&lt;b>id:&lt;/b> The id of the object being constructed&lt;/li>
+<span class='line'> 25</span>      *         &lt;li>&lt;b>onLoad(this): (optional)&lt;/b> when the object is successfully loaded from the server&lt;/li>
+<span class='line'> 26</span>      *         &lt;li>&lt;b>onChange(this): (optional)&lt;/b> when an update notification of the object is received&lt;/li>
+<span class='line'> 27</span>      *         &lt;li>&lt;b>onAdd(this): (optional)&lt;/b> when a notification that the object is created is received&lt;/li>
+<span class='line'> 28</span>      *         &lt;li>&lt;b>onDelete(this): (optional)&lt;/b> when a notification that the object is deleted is received&lt;/li>
+<span class='line'> 29</span>      *         &lt;li>&lt;b>onError(rsp): (optional)&lt;/b> if loading of the object fails, invoked with the error response object:&lt;ul>
+<span class='line'> 30</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'> 31</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'> 32</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>
+<span class='line'> 33</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'> 34</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'> 35</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'> 36</span>      *             &lt;/ul>&lt;/li>
+<span class='line'> 37</span>      *         &lt;/ul>&lt;/li>
+<span class='line'> 38</span>      *         &lt;li>&lt;b>parentObj: (optional)&lt;/b> The parent object&lt;/li>&lt;/ul>
+<span class='line'> 39</span>      * @constructs finesse.restservices.NotReadyReasonCode
+<span class='line'> 40</span>      **/</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">    </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">        </span><span class="NAME">this._super</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 44</span> 
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 46</span>      * @private
+<span class='line'> 47</span>      * Gets the REST class for the current object - this is the ReasonCodes class.
+<span class='line'> 48</span>      * @returns {Object} The ReasonCodes class.
+<span class='line'> 49</span>      */</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="NAME">getRestClass</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.NotReadyReasonCode</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 53</span> 
+<span class='line'> 54</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 55</span>      * @private
+<span class='line'> 56</span>      * Gets the REST type for the current object - this is a "ReasonCode".
+<span class='line'> 57</span>      * @returns {String} The ReasonCode string.
+<span class='line'> 58</span>      */</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="NAME">getRestType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"ReasonCode"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 62</span> 
+<span class='line'> 63</span> 
+<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 65</span>      * @private
+<span class='line'> 66</span>      * Gets the REST type for the current object - this is a "ReasonCodes".
+<span class='line'> 67</span>      * @returns {String} The ReasonCode string.
+<span class='line'> 68</span>      */</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="NAME">getParentRestType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"ReasonCodes"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 72</span> 
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 74</span>      * @private
+<span class='line'> 75</span>      * Override default to indicate that this object doesn't support making
+<span class='line'> 76</span>      * requests.
+<span class='line'> 77</span>      */</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="NAME">supportsRequests</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 79</span> 
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 81</span>      * @private
+<span class='line'> 82</span>      * Override default to indicate that this object doesn't support subscriptions.
+<span class='line'> 83</span>      */</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">    </span><span class="NAME">supportsSubscriptions</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 85</span> 
+<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 87</span>      * Getter for the category.
+<span class='line'> 88</span>      * @returns {String} The category.
+<span class='line'> 89</span>      */</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="NAME">getCategory</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">category</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 94</span> 
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 96</span>      * Getter for the code.
+<span class='line'> 97</span>      * @returns {String} The code.
+<span class='line'> 98</span>      */</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">    </span><span class="NAME">getCode</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">code</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>103</span> 
+<span class='line'>104</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>105</span>      * Getter for the label.
+<span class='line'>106</span>      * @returns {String} The label.
+<span class='line'>107</span>      */</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">    </span><span class="NAME">getLabel</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">label</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>112</span> 
+<span class='line'>113</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>114</span>      * Getter for the forAll value.
+<span class='line'>115</span>      * @returns {String} The forAll.
+<span class='line'>116</span>      */</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">    </span><span class="NAME">getForAll</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">forAll</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>121</span> 
+<span class='line'>122</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>123</span>      * Getter for the Uri value.
+<span class='line'>124</span>      * @returns {String} The Uri.
+<span class='line'>125</span>      */</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">    </span><span class="NAME">getUri</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">uri</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>130</span> 
+<span class='line'>131</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>132</span> 
+<span class='line'>133</span> </span></pre></body></html>

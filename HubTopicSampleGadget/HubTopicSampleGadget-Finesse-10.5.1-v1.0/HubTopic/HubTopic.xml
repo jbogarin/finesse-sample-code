@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+
+<ModulePrefs title="Sample Gadget HubTopic"
+        description="Sample Gadget HubTopic">
+
+    <Require feature="settitle" />
+    <Require feature="dynamic-height" />
+    <Require feature="pubsub-2" />
+	<Require feature="setprefs" />
+</ModulePrefs>
+
+<Content type="html">
+<![CDATA[
+	<!DOCTYPE html>
+	<!-- Styling -->
+    <link rel="stylesheet" href="HubTopic.css" type="text/css" />
+
+    <!-- jQuery 1.5 -->
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+    
+    <!-- Finesse Library -->
+    <script type="text/javascript" src="finesse-10.5.1.js"></script>
+
+    <!-- Gadget Business Logic -->
+    <script type="text/javascript" src="HubTopic.js"></script>
+
+    <body class="claro">
+
+    <!-- sample gadget -->
+     <div>
+        <br>	
+		<fieldset id="hubfieldset" class="outline">
+		<legend>Hub</legend>
+             <input id="hubtextin" type="textbox" size="60" >
+			<button onClick="finesse.modules.HubTopic.setHubText();">Show Text</button>
+			<div>Text: <span id="hubtext"></div>
+		</fieldset>
+   </div>
+    </body>
+
+    <script type="text/javascript">
+    gadgets.HubSettings.onConnect = function () {
+        finesse.modules.HubTopic.init();
+    };
+
+    </script>
+]]>
+</Content>
+</Module>

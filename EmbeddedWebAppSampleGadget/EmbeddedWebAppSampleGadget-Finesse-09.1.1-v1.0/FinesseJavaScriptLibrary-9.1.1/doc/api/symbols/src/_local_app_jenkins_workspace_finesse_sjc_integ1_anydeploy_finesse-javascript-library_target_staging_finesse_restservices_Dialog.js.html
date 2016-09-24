@@ -1,0 +1,561 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview JavaScript representation of the Finesse Dialog object.
+<span class='line'>  3</span>  *
+<span class='line'>  4</span>  * @name finesse.restservices.Dialog
+<span class='line'>  5</span>  * @requires finesse.clientservices.ClientServices
+<span class='line'>  6</span>  * @requires Class
+<span class='line'>  7</span>  * @requires finesse.FinesseBase
+<span class='line'>  8</span>  * @requires finesse.restservices.RestBase
+<span class='line'>  9</span>  */</span><span class="WHIT">
+<span class='line'> 10</span> 
+<span class='line'> 11</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 13</span> 
+<span class='line'> 14</span> </span><span class="COMM">/** @private */</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="NAME">finesse.restservices.Dialog</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.RestBase.extend</span><span class="PUNC">(</span><span class="COMM">/** @lends finesse.restservices.Dialog.prototype */</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 16</span> 
+<span class='line'> 17</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 18</span>      * @class
+<span class='line'> 19</span>      * JavaScript representation of a Dialog object. Also exposes methods to operate
+<span class='line'> 20</span>      * on the object against the server.
+<span class='line'> 21</span>      *
+<span class='line'> 22</span> 	 * @param {Object} options
+<span class='line'> 23</span> 	 *     An object with the following properties:&lt;ul>
+<span class='line'> 24</span>      *         &lt;li>&lt;b>id:&lt;/b> The id of the object being constructed&lt;/li>
+<span class='line'> 25</span>      *         &lt;li>&lt;b>onLoad(this): (optional)&lt;/b> when the object is successfully loaded from the server&lt;/li>
+<span class='line'> 26</span>      *         &lt;li>&lt;b>onChange(this): (optional)&lt;/b> when an update notification of the object is received&lt;/li>
+<span class='line'> 27</span>      *         &lt;li>&lt;b>onAdd(this): (optional)&lt;/b> when a notification that the object is created is received&lt;/li>
+<span class='line'> 28</span>      *         &lt;li>&lt;b>onDelete(this): (optional)&lt;/b> when a notification that the object is deleted is received&lt;/li>
+<span class='line'> 29</span>      *         &lt;li>&lt;b>onError(rsp): (optional)&lt;/b> if loading of the object fails, invoked with the error response object:&lt;ul>
+<span class='line'> 30</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'> 31</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'> 32</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>
+<span class='line'> 33</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'> 34</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'> 35</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'> 36</span>      *             &lt;/ul>&lt;/li>
+<span class='line'> 37</span>      *         &lt;/ul>&lt;/li>
+<span class='line'> 38</span>      *         &lt;li>&lt;b>parentObj: (optional)&lt;/b> The parent object&lt;/li>&lt;/ul>
+<span class='line'> 39</span>      * @constructs finesse.restservices.Dialog
+<span class='line'> 40</span>      **/</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">    </span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">        </span><span class="NAME">this._super</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 44</span> 
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 46</span>      * @private
+<span class='line'> 47</span>      * Gets the REST class for the current object - this is the Dialog class.
+<span class='line'> 48</span>      * @returns {Object} The Dialog class.
+<span class='line'> 49</span>      */</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="NAME">getRestClass</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">    </span><span class="COMM">//constant for agent device</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">    </span><span class="NAME">_agentDeviceType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"AGENT_DEVICE"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 58</span>      * @private
+<span class='line'> 59</span>      * Gets the REST type for the current object - this is a "Dialog".
+<span class='line'> 60</span>      * @returns {String} The Dialog string.
+<span class='line'> 61</span>      */</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">    </span><span class="NAME">getRestType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"Dialog"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 65</span> 
+<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 67</span>      * @private
+<span class='line'> 68</span>      * Override default to indicate that this object doesn't support making
+<span class='line'> 69</span>      * requests.
+<span class='line'> 70</span>      */</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="NAME">supportsRequests</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 72</span> 
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 74</span>      * @private
+<span class='line'> 75</span>      * Override default to indicate that this object doesn't support subscriptions.
+<span class='line'> 76</span>      */</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">    </span><span class="NAME">supportsSubscriptions</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 78</span> 
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 80</span>      * Getter for the DNIS.
+<span class='line'> 81</span>      * @returns {String} The DNIS.
+<span class='line'> 82</span>      */</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">    </span><span class="NAME">getDNIS</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">DNIS</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 87</span> 
+<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 89</span>      * Getter for the from address.
+<span class='line'> 90</span>      * @returns {String} The from address.
+<span class='line'> 91</span>      */</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="NAME">getFromAddress</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">fromAddress</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 96</span> 
+<span class='line'> 97</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 98</span>      * Getter for the to address.
+<span class='line'> 99</span>      * @returns {String} The to address.
+<span class='line'>100</span>      */</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">    </span><span class="NAME">getToAddress</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toAddress</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>106</span>      * Getter for the media type.
+<span class='line'>107</span>      * @returns {String} The media type.
+<span class='line'>108</span>      */</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">    </span><span class="NAME">getMediaType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">mediaType</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="COMM">/**
+<span class='line'>114</span>      * Getter for the uri.
+<span class='line'>115</span>      * @returns {String} The uri.
+<span class='line'>116</span>      */</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">    </span><span class="NAME">getDialogUri</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">uri</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>121</span> 
+<span class='line'>122</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>123</span>      * Getter for the callType.
+<span class='line'>124</span>      * @returns {String} The callType.
+<span class='line'>125</span>      */</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">    </span><span class="NAME">getCallType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">mediaProperties.callType</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>130</span> 
+<span class='line'>131</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>132</span>      * Getter for the Dialog state.
+<span class='line'>133</span>      * @returns {String} The Dialog state.
+<span class='line'>134</span>      */</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">    </span><span class="NAME">getState</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">state</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>139</span> 
+<span class='line'>140</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>141</span>      * Retrieves a list of participants within the Dialog object.
+<span class='line'>142</span>      * @returns {Object} List of
+<span class='line'>143</span>      */</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">    </span><span class="NAME">getParticipants</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">participants</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">participants.Participant</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">        </span><span class="COMM">//Due to the nature of the XML->JSO converter library, a single</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">        </span><span class="COMM">//element in the XML array will be considered to an object instead of</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">        </span><span class="COMM">//a real array. This will handle those cases to ensure that an array is</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">        </span><span class="COMM">//always returned.</span><span class="WHIT">
+<span class='line'>151</span> 
+<span class='line'>152</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities.getArray</span><span class="PUNC">(</span><span class="NAME">participants</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>154</span> 
+<span class='line'>155</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>156</span>      * Determines the droppable participants.  A droppable participant is a participant that is an agent extension.   
+<span class='line'>157</span>      * (It is not a CTI Route Point, IVR Port, or the caller)
+<span class='line'>158</span>      * 
+<span class='line'>159</span>      * @param filterExtension used to remove a single extension from the list
+<span class='line'>160</span>      * @returns participants which is an array of all participants which can be dropped
+<span class='line'>161</span>      */</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">    </span><span class="NAME">getDroppableParticipants</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">filterExtension</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">      </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">droppableParticipants</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">participants</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">index</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filterExtensionToRemove</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callStateOk</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">part</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>165</span> 
+<span class='line'>166</span> </span><span class="WHIT">      </span><span class="NAME">participants</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getParticipants</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>167</span> 
+<span class='line'>168</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">filterExtension</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">      </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">        </span><span class="NAME">filterExtensionToRemove</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filterExtension</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>172</span> 
+<span class='line'>173</span> </span><span class="WHIT">      </span><span class="COMM">//Loop through all the participants to remove non-agents & remove filterExtension</span><span class="WHIT">
+<span class='line'>174</span> </span><span class="WHIT">      </span><span class="COMM">//We could have removed filterExtension using splice, but we have to iterate through</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="WHIT">      </span><span class="COMM">//the list anyway.</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">      </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="NAME">idx</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">idx</span><span class="PUNC">&lt;</span><span class="NAME">participants.length</span><span class="PUNC">;</span><span class="NAME">idx</span><span class="PUNC">=</span><span class="NAME">idx</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">      </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">        </span><span class="NAME">part</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">participants</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>179</span> 
+<span class='line'>180</span> </span><span class="WHIT">        </span><span class="COMM">//Skip the filterExtension</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">part.mediaAddress</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">filterExtensionToRemove</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">        </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">            </span><span class="NAME">callStateOk</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._isParticipantStateDroppable</span><span class="PUNC">(</span><span class="NAME">part</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> 
+<span class='line'>185</span> </span><span class="WHIT">            </span><span class="COMM">//Remove non-agents & make sure callstate </span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callStateOk</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">part.mediaAddressType</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">this._agentDeviceType</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">            </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">              </span><span class="NAME">droppableParticipants.push</span><span class="PUNC">(</span><span class="NAME">part</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>192</span> 
+<span class='line'>193</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">finesse.utilities.Utilities.getArray</span><span class="PUNC">(</span><span class="NAME">droppableParticipants</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>195</span> 
+<span class='line'>196</span> </span><span class="WHIT">    </span><span class="NAME">_isParticipantStateDroppable</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">part</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">isParticipantStateDroppable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">part.state</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.States.ACTIVE</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">part.state</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.States.ACCEPTED</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">part.state</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.States.HELD</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">      </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="WHIT">        </span><span class="NAME">isParticipantStateDroppable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">      </span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">isParticipantStateDroppable</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>208</span>      * Is the participant droppable
+<span class='line'>209</span>      *
+<span class='line'>210</span>      * @param participantExt
+<span class='line'>211</span>      * @returns boolean
+<span class='line'>212</span>      */</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">    </span><span class="NAME">isParticipantDroppable</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">participantExt</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">droppableParticipants</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">isDroppable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">part</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callStateOk</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="WHIT">      </span><span class="WHIT">
+<span class='line'>216</span> </span><span class="WHIT">      </span><span class="NAME">droppableParticipants</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getDroppableParticipants</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">      </span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">droppableParticipants</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">      </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="NAME">idx</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">idx</span><span class="PUNC">&lt;</span><span class="NAME">droppableParticipants.length</span><span class="PUNC">;</span><span class="NAME">idx</span><span class="PUNC">=</span><span class="NAME">idx</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>221</span> </span><span class="WHIT">        </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>222</span> </span><span class="WHIT">          </span><span class="NAME">part</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">droppableParticipants</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>223</span> </span><span class="WHIT">         </span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">          </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">part.mediaAddress</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">participantExt</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">          </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>226</span> </span><span class="WHIT">            </span><span class="NAME">callStateOk</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._isParticipantStateDroppable</span><span class="PUNC">(</span><span class="NAME">part</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>227</span> 
+<span class='line'>228</span> </span><span class="WHIT">            </span><span class="COMM">//Remove non-agents & make sure callstate </span><span class="WHIT">
+<span class='line'>229</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">callStateOk</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">part.mediaAddressType</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">this._agentDeviceType</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">            </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="WHIT">              </span><span class="NAME">isDroppable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>232</span> </span><span class="WHIT">              </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>233</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>234</span> </span><span class="WHIT">          </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>235</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>237</span> </span><span class="WHIT">      </span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">isDroppable</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>242</span>      * Retrieves a list of media properties a.k.a. call variables from the dialog object
+<span class='line'>243</span>      * @returns {Object} Map of call variables; names mapped to values
+<span class='line'>244</span>      */</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">    </span><span class="NAME">getMediaProperties</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>246</span> 
+<span class='line'>247</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mpData</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">resultMap</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>248</span> 
+<span class='line'>249</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>250</span> 
+<span class='line'>251</span> </span><span class="WHIT">        </span><span class="NAME">mpData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getData</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">mediaProperties</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>252</span> 
+<span class='line'>253</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mpData</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>254</span> 
+<span class='line'>255</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.getState</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.States.INITIATING</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>256</span> 
+<span class='line'>257</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mpData.callvariables</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">mpData.callvariables.CallVariable</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>258</span> </span><span class="WHIT">                    </span><span class="NAME">jQuery.each</span><span class="PUNC">(</span><span class="NAME">mpData.callvariables.CallVariable</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callVariable</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>259</span> </span><span class="WHIT">                        </span><span class="NAME">resultMap</span><span class="PUNC">[</span><span class="NAME">callVariable.name</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">callVariable.value</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>260</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>261</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>262</span> 
+<span class='line'>263</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>264</span> 
+<span class='line'>265</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mpData.wrapUpReason</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="WHIT">                </span><span class="NAME">resultMap.wrapUpReason</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mpData.wrapUpReason</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>268</span> 
+<span class='line'>269</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>270</span> 
+<span class='line'>271</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">resultMap</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>272</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>273</span> 
+<span class='line'>274</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>275</span>      * @private
+<span class='line'>276</span>      * Invoke a request to the server given a content body and handlers.
+<span class='line'>277</span>      *
+<span class='line'>278</span>      * @param {Object} contentBody
+<span class='line'>279</span>      *     A JS object containing the body of the action request.
+<span class='line'>280</span>      * @param {Object} handlers
+<span class='line'>281</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>282</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>283</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>284</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>285</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>286</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>287</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>288</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>289</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>290</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>291</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>292</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>293</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>294</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>295</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>296</span>      *         &lt;/ul>
+<span class='line'>297</span>      */</span><span class="WHIT">
+<span class='line'>298</span> </span><span class="WHIT">    </span><span class="NAME">_makeRequest</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">contentBody</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>299</span> </span><span class="WHIT">        </span><span class="COMM">// Protect against null dereferencing of options allowing its</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="WHIT">        </span><span class="COMM">// (nonexistant) keys to be read as undefined</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">        </span><span class="NAME">handlers</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>302</span> 
+<span class='line'>303</span> </span><span class="WHIT">        </span><span class="NAME">this.restRequest</span><span class="PUNC">(</span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="WHIT">            </span><span class="NAME">method</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'PUT'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="WHIT">            </span><span class="NAME">success</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.success</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="WHIT">            </span><span class="NAME">error</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">handlers.error</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="WHIT">            </span><span class="NAME">content</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>310</span> 
+<span class='line'>311</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>312</span>      * Invoke a consult call out to a destination.
+<span class='line'>313</span>      *
+<span class='line'>314</span>      * @param {String} mediaAddress
+<span class='line'>315</span>      *     The media address of the user performing the consult call.
+<span class='line'>316</span>      * @param {String} toAddress
+<span class='line'>317</span>      *     The destination address of the consult call.
+<span class='line'>318</span>      * @param {Object} handlers
+<span class='line'>319</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>320</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>321</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>322</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>323</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>324</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>325</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>326</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>327</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>328</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>329</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>330</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>331</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>332</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>333</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>334</span>      *         &lt;/ul>
+<span class='line'>335</span>      */</span><span class="WHIT">
+<span class='line'>336</span> </span><span class="WHIT">    </span><span class="NAME">makeConsultCall</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">toAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>337</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>338</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>339</span> </span><span class="WHIT">        </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>340</span> </span><span class="WHIT">            </span><span class="STRN">"targetMediaAddress"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>341</span> </span><span class="WHIT">            </span><span class="STRN">"toAddress"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">toAddress</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>342</span> </span><span class="WHIT">            </span><span class="STRN">"requestedAction"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.Actions.CONSULT_CALL</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="WHIT">        </span><span class="NAME">this._makeRequest</span><span class="PUNC">(</span><span class="NAME">contentBody</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>345</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>346</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>347</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>348</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>349</span>      * Invoke a single step transfer request.
+<span class='line'>350</span>      *
+<span class='line'>351</span>      * @param {String} mediaAddress
+<span class='line'>352</span>      *     The media address of the user performing the single step transfer.
+<span class='line'>353</span>      * @param {String} toAddress
+<span class='line'>354</span>      *     The destination address of the single step transfer.
+<span class='line'>355</span>      * @param {Object} handlers
+<span class='line'>356</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>357</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>358</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>359</span>      *         &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>360</span>      *         &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>361</span>      *         &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>362</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>363</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>364</span>      *         &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>365</span>      *         &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>366</span>      *         &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>367</span>      *         &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>368</span>      *         &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>369</span>      *         &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>370</span>      *         &lt;/ul>&lt;/li>
+<span class='line'>371</span>      *         &lt;/ul>
+<span class='line'>372</span>      */</span><span class="WHIT">
+<span class='line'>373</span> </span><span class="WHIT">    </span><span class="NAME">initiateDirectTransfer</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">toAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>374</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>375</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>376</span> </span><span class="WHIT">        </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>377</span> </span><span class="WHIT">            </span><span class="STRN">"targetMediaAddress"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>378</span> </span><span class="WHIT">            </span><span class="STRN">"toAddress"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">toAddress</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>379</span> </span><span class="WHIT">            </span><span class="STRN">"requestedAction"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.Actions.TRANSFER_SST</span><span class="WHIT">
+<span class='line'>380</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>381</span> </span><span class="WHIT">        </span><span class="NAME">this._makeRequest</span><span class="PUNC">(</span><span class="NAME">contentBody</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>382</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>383</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>384</span> 
+<span class='line'>385</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>386</span>      * Update this dialog's wrap-up reason.
+<span class='line'>387</span>      *
+<span class='line'>388</span>      * @param {String} wrapUpReason
+<span class='line'>389</span>      *     The new wrap-up reason for this dialog
+<span class='line'>390</span>      * @param {Object} handlers
+<span class='line'>391</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>392</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>393</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>394</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>395</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>396</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>397</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>398</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>399</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>400</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>401</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>402</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>403</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>404</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>405</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>406</span>      *         &lt;/ul>
+<span class='line'>407</span>      */</span><span class="WHIT">
+<span class='line'>408</span> </span><span class="WHIT">    </span><span class="NAME">updateWrapUpReason</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">wrapUpReason</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>409</span> </span><span class="WHIT">    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>410</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>411</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mediaProperties</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">
+<span class='line'>412</span> </span><span class="WHIT">        </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>413</span> </span><span class="WHIT">            </span><span class="STRN">"wrapUpReason"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">wrapUpReason</span><span class="WHIT">
+<span class='line'>414</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>415</span> 
+<span class='line'>416</span> </span><span class="WHIT">        </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>417</span> </span><span class="WHIT">        </span><span class="NAME">options.content</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>418</span> </span><span class="WHIT">        </span><span class="NAME">options.content</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">
+<span class='line'>419</span> </span><span class="WHIT">        </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>420</span> </span><span class="WHIT">            </span><span class="STRN">"mediaProperties"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">mediaProperties</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>421</span> </span><span class="WHIT">            </span><span class="STRN">"requestedAction"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.Actions.UPDATE_CALL_DATA</span><span class="WHIT">
+<span class='line'>422</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>423</span> </span><span class="WHIT">        </span><span class="NAME">options.method</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"PUT"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT">        </span><span class="NAME">this.restRequest</span><span class="PUNC">(</span><span class="NAME">this.getRestUrl</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>425</span> 
+<span class='line'>426</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>428</span> 
+<span class='line'>429</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>430</span>      * Invoke a request to server based on the action given.
+<span class='line'>431</span>      * @param {String} mediaAddress
+<span class='line'>432</span>      *     The media address of the user performing the consult call.
+<span class='line'>433</span>      * @param {String} action
+<span class='line'>434</span>      *     The action string indicating the action to invoke on dialog.
+<span class='line'>435</span>      * @param {Object} handlers
+<span class='line'>436</span>      *     An object containing the following (optional) handlers for the request:&lt;ul>
+<span class='line'>437</span>      *         &lt;li>&lt;b>success(rsp):&lt;/b> A callback function for a successful request to be invoked with the following
+<span class='line'>438</span>      *         response object as its only parameter:&lt;ul>
+<span class='line'>439</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>440</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>441</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response&lt;/li>&lt;/ul>
+<span class='line'>442</span>      *         &lt;li>A error callback function for an unsuccessful request to be invoked with the
+<span class='line'>443</span>      *         error response object as its only parameter:&lt;ul>
+<span class='line'>444</span>      *             &lt;li>&lt;b>status:&lt;/b> {Number} The HTTP status code returned&lt;/li>
+<span class='line'>445</span>      *             &lt;li>&lt;b>content:&lt;/b> {String} Raw string of response&lt;/li>
+<span class='line'>446</span>      *             &lt;li>&lt;b>object:&lt;/b> {Object} Parsed object of response (HTTP errors)&lt;/li>
+<span class='line'>447</span>      *             &lt;li>&lt;b>error:&lt;/b> {Object} Wrapped exception that was caught:&lt;ul>
+<span class='line'>448</span>      *                 &lt;li>&lt;b>errorType:&lt;/b> {String} Type of error that was caught&lt;/li>
+<span class='line'>449</span>      *                 &lt;li>&lt;b>errorMessage:&lt;/b> {String} Message associated with error&lt;/li>
+<span class='line'>450</span>      *             &lt;/ul>&lt;/li>
+<span class='line'>451</span>      *         &lt;/ul>
+<span class='line'>452</span>      * @private
+<span class='line'>453</span>      */</span><span class="WHIT">
+<span class='line'>454</span> </span><span class="WHIT">    </span><span class="NAME">requestAction</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">action</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>455</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>456</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>457</span> </span><span class="WHIT">        </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>458</span> </span><span class="WHIT">            </span><span class="STRN">"targetMediaAddress"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>459</span> </span><span class="WHIT">            </span><span class="STRN">"requestedAction"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">action</span><span class="WHIT">
+<span class='line'>460</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>461</span> </span><span class="WHIT">        </span><span class="NAME">this._makeRequest</span><span class="PUNC">(</span><span class="NAME">contentBody</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>462</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>463</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>464</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>465</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>466</span>      * Wrapper around "requestAction" to request PARTICIPANT_DROP action.
+<span class='line'>467</span>      *
+<span class='line'>468</span>      * @param targetMediaAddress is the address to drop
+<span class='line'>469</span>      * @param handlers to be invoked on success/error
+<span class='line'>470</span>      * @private 
+<span class='line'>471</span>      */</span><span class="WHIT">
+<span class='line'>472</span> </span><span class="WHIT">    </span><span class="NAME">dropParticipant</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">targetMediaAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>473</span> </span><span class="WHIT">		</span><span class="NAME">this.requestAction</span><span class="PUNC">(</span><span class="NAME">targetMediaAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">finesse.restservices.Dialog.Actions.PARTICIPANT_DROP</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>474</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>475</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>476</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>477</span>      * Invoke a request to server based on the action given.
+<span class='line'>478</span>      * @param {String} mediaAddress
+<span class='line'>479</span>      * @param {String} action
+<span class='line'>480</span>      *     The action string indicating the action to invoke on dialog.
+<span class='line'>481</span>      * @param {Object} [handlers]
+<span class='line'>482</span>      *     A set of handlers invoked when async response comes back.
+<span class='line'>483</span>      * @param {Function} [handlers.success]
+<span class='line'>484</span>      *     The success handler when request is successful.
+<span class='line'>485</span>      * @param {Function} [hanlders.error]
+<span class='line'>486</span>      *     The error handler when request has errors.
+<span class='line'>487</span>      * @private
+<span class='line'>488</span>      */</span><span class="WHIT">
+<span class='line'>489</span> </span><span class="WHIT">    </span><span class="NAME">sendDTMFRequest</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">digit</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>490</span> </span><span class="WHIT">        </span><span class="NAME">this.isLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>491</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contentBody</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>492</span> </span><span class="WHIT">        </span><span class="NAME">contentBody</span><span class="PUNC">[</span><span class="NAME">this.getRestType</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>493</span> </span><span class="WHIT">            </span><span class="STRN">"targetMediaAddress"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">mediaAddress</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>494</span> </span><span class="WHIT">            </span><span class="STRN">"requestedAction"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"SEND_DTMF"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>495</span> </span><span class="WHIT">            </span><span class="STRN">"actionParams"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>496</span> </span><span class="WHIT">				</span><span class="STRN">"ActionParam"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>497</span> </span><span class="WHIT">					</span><span class="STRN">"name"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"dtmfString"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>498</span> </span><span class="WHIT">					</span><span class="STRN">"value"</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">digit</span><span class="WHIT">
+<span class='line'>499</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>500</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>501</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>502</span> </span><span class="WHIT">        </span><span class="NAME">this._makeRequest</span><span class="PUNC">(</span><span class="NAME">contentBody</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handlers</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>503</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Allow cascading</span><span class="WHIT">
+<span class='line'>504</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>505</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>506</span> 
+<span class='line'>507</span> </span><span class="COMM">/**
+<span class='line'>508</span>  * Possible dialog state constants.
+<span class='line'>509</span>  */</span><span class="WHIT">
+<span class='line'>510</span> </span><span class="NAME">finesse.restservices.Dialog.States</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>511</span> </span><span class="WHIT">    </span><span class="NAME">ALERTING</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ALERTING"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>512</span> </span><span class="WHIT">    </span><span class="NAME">INITIATING</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"INITIATING"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>513</span> </span><span class="WHIT">    </span><span class="NAME">ACTIVE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ACTIVE"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>514</span> </span><span class="WHIT">    </span><span class="NAME">DROPPED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"DROPPED"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>515</span> </span><span class="WHIT">    </span><span class="NAME">HELD</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"HELD"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>516</span> </span><span class="WHIT">    </span><span class="NAME">INITIATED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"INITIATED"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>517</span> </span><span class="WHIT">    </span><span class="NAME">FAILED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"FAILED"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>518</span> </span><span class="WHIT">    </span><span class="NAME">INACTIVE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"INACTIVE"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>519</span> </span><span class="WHIT">    </span><span class="NAME">WRAP_UP</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"WRAP_UP"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>520</span> </span><span class="WHIT">    </span><span class="NAME">ACCEPTED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ACCEPTED"</span><span class="WHIT">
+<span class='line'>521</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>522</span> 
+<span class='line'>523</span> </span><span class="COMM">/**
+<span class='line'>524</span>  * Possible dialog state reasons code constants.
+<span class='line'>525</span>  */</span><span class="WHIT">
+<span class='line'>526</span> </span><span class="NAME">finesse.restservices.Dialog.ReasonStates</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>527</span> </span><span class="WHIT">    </span><span class="NAME">BUSY</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"BUSY"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>528</span> </span><span class="WHIT">    </span><span class="NAME">BAD_DESTINATION</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"BAD_DESTINATION"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>529</span> </span><span class="WHIT">    </span><span class="NAME">OTHER</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"OTHER"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>530</span> </span><span class="WHIT">    </span><span class="NAME">DEVICE_RESOURCE_NOT_AVAILABLE</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"DEVICE_RESOURCE_NOT_AVAILABLE"</span><span class="WHIT">
+<span class='line'>531</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>532</span> 
+<span class='line'>533</span> </span><span class="COMM">/**
+<span class='line'>534</span>  * Possible participant actions constants.
+<span class='line'>535</span>  */</span><span class="WHIT">
+<span class='line'>536</span> </span><span class="NAME">finesse.restservices.Dialog.Actions</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>537</span> </span><span class="WHIT">    </span><span class="NAME">DROP</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"DROP"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>538</span> </span><span class="WHIT">    </span><span class="NAME">ANSWER</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ANSWER"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>539</span> </span><span class="WHIT">    </span><span class="NAME">HOLD</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"HOLD"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>540</span> </span><span class="WHIT">    </span><span class="NAME">BARGE_CALL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"BARGE_CALL"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>541</span> </span><span class="WHIT">    </span><span class="NAME">PARTICIPANT_DROP</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"PARTICIPANT_DROP"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>542</span> </span><span class="WHIT">    </span><span class="NAME">MAKE_CALL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"MAKE_CALL"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>543</span> </span><span class="WHIT">    </span><span class="NAME">RETRIEVE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"RETRIEVE"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>544</span> </span><span class="WHIT">    </span><span class="NAME">CONSULT_CALL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"CONSULT_CALL"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>545</span> </span><span class="WHIT">    </span><span class="NAME">TRANSFER</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"TRANSFER"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>546</span> </span><span class="WHIT">    </span><span class="NAME">TRANSFER_SST</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"TRANSFER_SST"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>547</span> </span><span class="WHIT">    </span><span class="NAME">CONFERENCE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"CONFERENCE"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>548</span> </span><span class="WHIT">    </span><span class="NAME">UPDATE_CALL_DATA</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"UPDATE_CALL_DATA"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>549</span> </span><span class="WHIT">    </span><span class="NAME">DTMF</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"SEND_DTMF"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>550</span> </span><span class="WHIT">    </span><span class="NAME">ACCEPT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"ACCEPT"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>551</span> </span><span class="WHIT">    </span><span class="NAME">REJECT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"REJECT"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>552</span> </span><span class="WHIT">    </span><span class="NAME">CLOSE</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"CLOSE"</span><span class="WHIT">
+<span class='line'>553</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>554</span> </span></pre></body></html>

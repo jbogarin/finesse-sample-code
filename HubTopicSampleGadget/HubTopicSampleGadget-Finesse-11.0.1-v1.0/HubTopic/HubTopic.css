@@ -1,0 +1,10 @@
+/**
+ * Default attributes for gadget body.
+ */
+body {
+	font-family: Arial;
+	/*color: #ffffff; */
+	color: #000000;
+    background: none transparent;
+    padding: 0px;
+}

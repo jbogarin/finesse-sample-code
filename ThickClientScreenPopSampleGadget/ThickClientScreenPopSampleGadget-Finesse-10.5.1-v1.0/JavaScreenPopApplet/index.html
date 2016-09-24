@@ -1,0 +1,22 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+        <title>Insert title here</title>
+		
+		
+        <SCRIPT LANGUAGE="JavaScript">
+            function doCommand() 
+            {
+                document.JavaScreenPopApplet.commandLine = "C:\\Users\\dlender\\Documents\\Finesse\\10.0(1)\\Samples\\ThickClientScreenPopSampleGadget\\JavaApplet\\WindowsApplication2.exe test";
+				alert (document.JavaScreenPopApplet.commandLine);
+                document.JavaScreenPopApplet.executeCommandLine();
+				
+            }
+        </SCRIPT></HEAD>
+    <BODY >
+        <b>This is the Applet</b>
+    <APPLET CODE="JavaScreenPopApplet.class" codebase="." archive="JavaScreenPop.jar" NAME="JavaScreenPopApplet" WIDTH=350 HEIGHT=100 >
+    </APPLET >
+    <FORM NAME="Command">
+        <button onClick="doCommand();">Doit</button>
+    </form>
+</BODY > 
+</html>

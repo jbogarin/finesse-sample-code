@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+
+<ModulePrefs title="Sample Gadget"
+        description="Sample Gadget"
+        thumbnail="http://localhost:8080/">
+
+    <Require feature="settitle" />
+    <Require feature="dynamic-height" />
+    <Require feature="pubsub-2" />
+	<Require feature="setprefs" />
+</ModulePrefs>
+
+<Content type="html">
+<![CDATA[
+	<!DOCTYPE html>
+	<!-- Styling -->
+    <link rel="stylesheet" href="PhoneBook.css" type="text/css" />
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="/desktop/assets/js/jquery.min.js"></script>
+   
+    <!-- Finesse Library -->
+    <script type="text/javascript" src="/desktop/assets/js/finesse.js"></script>
+    
+    <!-- Gadget Business Logic -->
+    <script type="text/javascript" src="PhoneBook.js"></script>
+
+    <body class="claro">
+
+    <!-- sample gadget -->
+     <div>
+        <fieldset id="userfieldset" class="outline">
+            <legend>User</legend>
+			<div><b> User ID: </b><span id="userId"></span></div>
+            <div><b> First Name: </b><span id="firstName"></div>
+            <div><b> Last Name: </b><span id="lastName"></div>
+            <div><b> Role: </b><span id="userRole"></div>
+            <div><b> Extension: </b><span id="extension"></div>
+            <div><b> Current User State: </b><span id="userState"></div>
+            <br>
+            <div id="goReady">
+            	<button onClick="finesse.modules.SampleGadget.setUserState('READY');">Change state to READY</button>
+        	</div>
+        	<div id="goNotReady">
+            	<button onClick="finesse.modules.SampleGadget.setUserState('NOT_READY');">Change state to NOT READY</button>
+        	</div>
+        	<br>
+        	<div id="makeCallButton">
+			<input type="text" id="phoneId" value="1001002"></input>
+            	<button onClick="finesse.modules.SampleGadget.makeCall((document.getElementById ('phoneId')).value);">Make Call</button>
+        	</div>
+        </fieldset>
+        <br>
+        
+        <fieldset id="dialogfieldset" class="outline">
+            <legend>Dialog</legend>
+            <div><b> Call Id: </b><span id="callId"></div>
+            <div><b> DNIS: </b><span id="dnis"></div>
+            <div><b> From Address: </b><span id="fromAddress"></div>
+            <div><b> To Address: </b><span id="toAddress"></div>
+            <div><b> Call State: </b><span id="callState"></div>
+            <br>
+            <iframe name="bing" id="bing" src="" width="900" height="300"></iframe>
+        </fieldset>
+		<fieldset id="phonebooksfieldset" class="outline">
+		    <legend>Phonebook</legend>
+		<div>
+        <div id="agentout" style="margin: 4x">
+         </div>
+   </div>
+    </body>
+
+    <script type="text/javascript">
+    gadgets.HubSettings.onConnect = function () {
+        finesse.modules.SampleGadget.init();
+	  document.getElementById('bing').src = "http://www.bing.com";
+    };
+
+    </script>
+]]>
+</Content>
+</Module>

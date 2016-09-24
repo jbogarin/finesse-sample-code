@@ -1,0 +1,898 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>JsDoc Reference - finesse.restservices.RestBase</title>
+
+		<style type="text/css">
+			/* default.css */
+body
+{
+	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	width: 800px;
+}
+
+.header
+{
+	clear: both;
+	background-color: #ccc;
+	padding: 8px;
+}
+
+h1
+{
+	font-size: 150%;
+	font-weight: bold;
+	padding: 0;
+	margin: 1em 0 0 .3em;
+}
+
+hr
+{
+	border: none 0;
+	border-top: 1px solid #7F8FB1;
+	height: 1px;
+}
+
+pre.code
+{
+	display: block;
+	padding: 8px;
+	border: 1px dashed #ccc;
+}
+
+#index
+{
+	margin-top: 24px;
+	float: left;
+	width: 340px;
+	position: absolute;
+	left: 8px;
+	background-color: #F3F3F3;
+	padding: 8px;
+}
+
+#content
+{
+	margin-left: 370px;
+	width: 600px;
+}
+
+.classList
+{
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 0 8px;
+	font-family: arial, sans-serif;
+	font-size: 1em;
+	overflow: auto;
+}
+
+.classList li
+{
+	padding: 0;
+	margin: 0 0 8px 0;
+}
+
+.summaryTable { width: 100%; }
+
+h1.classTitle
+{
+	font-size:170%;
+	line-height:130%;
+}
+
+h2 { font-size: 110%; }
+caption, div.sectionTitle
+{
+	background-color: #7F8FB1;
+	color: #fff;
+	font-size:130%;
+	text-align: left;
+	padding: 2px 6px 2px 6px;
+	border: 1px #7F8FB1 solid;
+}
+
+div.sectionTitle { margin-bottom: 8px; }
+.summaryTable thead { display: none; }
+
+.summaryTable td
+{
+	vertical-align: top;
+	padding: 4px;
+	border-bottom: 1px #7F8FB1 solid;
+	border-right: 1px #7F8FB1 solid;
+}
+
+/*col#summaryAttributes {}*/
+.summaryTable td.attributes
+{
+	border-left: 1px #7F8FB1 solid;
+	width: 140px;
+	text-align: right;
+}
+
+td.attributes, .fixedFont
+{
+	line-height: 15px;
+	color: #002EBE;
+	font-family: "Courier New",Courier,monospace;
+	font-size: 13px;
+}
+
+.summaryTable td.nameDescription
+{
+	text-align: left;
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.summaryTable td.nameDescription, .description
+{
+	line-height: 15px;
+	padding: 4px;
+	padding-left: 4px;
+}
+
+.summaryTable { margin-bottom: 8px; }
+
+ul.inheritsList
+{
+	list-style: square;
+	margin-left: 20px;
+	padding-left: 0;
+}
+
+.detailList {
+	margin-left: 20px; 
+	line-height: 15px;
+}
+.detailList dt { margin-left: 20px; }
+
+.detailList .heading
+{
+	font-weight: bold;
+	padding-bottom: 6px;
+	margin-left: 0;
+}
+
+.light, td.attributes, .light a:link, .light a:visited
+{
+	color: #777;
+	font-style: italic;
+}
+
+.fineprint
+{
+	font-size: 10px;
+	margin-left: 370px;
+	width: 600px;
+}
+
+		</style>
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->	
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/finesse.clientservices.html">finesse.clientservices</a></li>
+	
+	<li><a href="../symbols/finesse.clientservices.ClientServices.html">finesse.clientservices.ClientServices</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.html">finesse.containerservices</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.ContainerServices.html">finesse.containerservices.ContainerServices</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.ContainerServices.Topics.html">finesse.containerservices.ContainerServices.Topics</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.GadgetViewChangedEvent.html">finesse.containerservices.GadgetViewChangedEvent</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.MaxAvailableHeightChangedEvent.html">finesse.containerservices.MaxAvailableHeightChangedEvent</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.TimerTickEvent.html">finesse.containerservices.TimerTickEvent</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.WorkflowActionEvent.html">finesse.containerservices.WorkflowActionEvent</a></li>
+	
+	<li><a href="../symbols/finesse.containerservices.WorkflowActionEvent.HandledBy.html">finesse.containerservices.WorkflowActionEvent.HandledBy</a></li>
+	
+	<li><a href="../symbols/finesse.cslogger.html">finesse.cslogger</a></li>
+	
+	<li><a href="../symbols/finesse.cslogger.ClientLogger.html">finesse.cslogger.ClientLogger</a></li>
+	
+	<li><a href="../symbols/finesse.interfaces.html">finesse.interfaces</a></li>
+	
+	<li><a href="../symbols/finesse.interfaces.RequestHandlers.html">finesse.interfaces.RequestHandlers</a></li>
+	
+	<li><a href="../symbols/finesse.interfaces.RestObjectHandlers.html">finesse.interfaces.RestObjectHandlers</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.html">finesse.restservices</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Contact.html">finesse.restservices.Contact</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Contacts.html">finesse.restservices.Contacts</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Dialog.html">finesse.restservices.Dialog</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Dialog.Actions.html">finesse.restservices.Dialog.Actions</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Dialog.ParticipantStates.html">finesse.restservices.Dialog.ParticipantStates</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Dialog.ReasonStates.html">finesse.restservices.Dialog.ReasonStates</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Dialog.States.html">finesse.restservices.Dialog.States</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Dialogs.html">finesse.restservices.Dialogs</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.MediaPropertiesLayout.html">finesse.restservices.MediaPropertiesLayout</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.MediaPropertiesLayout.Object.html">finesse.restservices.MediaPropertiesLayout.Object</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.PhoneBook.html">finesse.restservices.PhoneBook</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.PhoneBooks.html">finesse.restservices.PhoneBooks</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Queue.html">finesse.restservices.Queue</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Queues.html">finesse.restservices.Queues</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.RestBase.html">finesse.restservices.RestBase</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.RestCollectionBase.html">finesse.restservices.RestCollectionBase</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.SystemInfo.html">finesse.restservices.SystemInfo</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.SystemInfo.Statuses.html">finesse.restservices.SystemInfo.Statuses</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Team.html">finesse.restservices.Team</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.User.html">finesse.restservices.User</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.User.States.html">finesse.restservices.User.States</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.User.WorkMode.html">finesse.restservices.User.WorkMode</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.User.WrapUpMode.html">finesse.restservices.User.WrapUpMode</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.Users.html">finesse.restservices.Users</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.WrapUpReason.html">finesse.restservices.WrapUpReason</a></li>
+	
+	<li><a href="../symbols/finesse.restservices.WrapUpReasons.html">finesse.restservices.WrapUpReasons</a></li>
+	
+	<li><a href="../symbols/finesse.utilities.html">finesse.utilities</a></li>
+	
+	<li><a href="../symbols/finesse.utilities.Utilities.html">finesse.utilities.Utilities</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+		
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Class finesse.restservices.RestBase
+			</h1>
+
+<!-- ============================== class summary ========================== -->			
+			<p class="description">
+				
+				
+			
+				JavaScript representation of a REST object. Also exposes methods to operate
+on the object against the server.  This object is typically extended into individual
+REST Objects (like Dialog, User, etc...), and shouldn't be used directly.
+				
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/_local_app_jenkins_workspace_finesse_sjc_1051_deploy_finesse-javascript-library_target_finesse-javascript-library-10.5.1_finesse.js.html">finesse.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->			
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class finesse.restservices.RestBase.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/finesse.restservices.RestBase.html#constructor">finesse.restservices.RestBase</a></b>(id, callbacks, restObj)
+							</div>
+							<div class="description"></div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class finesse.restservices.RestBase.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#addHandler">addHandler</a></b>(notifierType, callback, scope)
+								</div>
+								<div class="description">Adds an handler to this object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#getData">getData</a></b>()
+								</div>
+								<div class="description">Gets the data for this object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#getId">getId</a></b>()
+								</div>
+								<div class="description">Getter for the id of this RestBase</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#getProperty">getProperty</a></b>(obj, property)
+								</div>
+								<div class="description">Gets a property from the object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#hasProperty">hasProperty</a></b>(obj, property)
+								</div>
+								<div class="description">Determines if the object has a particular property.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#isLoaded">isLoaded</a></b>()
+								</div>
+								<div class="description">Utility method gating any operations that require complete instantiation</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#refresh">refresh</a></b>(retries)
+								</div>
+								<div class="description">Force an update on this object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/finesse.restservices.RestBase.html#removeHandler">removeHandler</a></b>(notifierType, callback)
+								</div>
+								<div class="description">Removes a handler from this object.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
+				</div>
+				
+				<div class="fixedFont">
+						<b>finesse.restservices.RestBase</b>(id, callbacks, restObj)
+				</div>
+				
+				<div class="description">
+					
+					
+				</div>
+				
+				
+				
+				
+					
+						<dl class="detailList">
+						<dt class="heading">Parameters:</dt>
+						
+							<dt>
+								<span class="light fixedFont">{String}</span>  <b>id</b>
+								
+							</dt>
+								<dd>The ID that uniquely identifies the REST object.</dd>
+						
+							<dt>
+								<span class="light fixedFont">{Object}</span>  <b>callbacks</b>
+								
+							</dt>
+								<dd>An object containing callbacks for instantiation and runtime
+    Callback to invoke upon successful instantiation, passes in REST object.</dd>
+						
+							<dt>
+								<span class="light fixedFont">{Function}</span>  <b>callbacks.onLoad(this)</b>
+								
+							</dt>
+								<dd>Callback to invoke upon loading the data for the first time.</dd>
+						
+							<dt>
+								<span class="light fixedFont">{Function}</span>  <b>callbacks.onChange(this)</b>
+								
+							</dt>
+								<dd>Callback to invoke upon successful update object (PUT)</dd>
+						
+							<dt>
+								<span class="light fixedFont">{Function}</span>  <b>callbacks.onAdd(this)</b>
+								
+							</dt>
+								<dd>Callback to invoke upon successful update to add object (POST)</dd>
+						
+							<dt>
+								<span class="light fixedFont">{Function}</span>  <b>callbacks.onDelete(this)</b>
+								
+							</dt>
+								<dd>Callback to invoke upon successful update to delete object (DELETE)</dd>
+						
+							<dt>
+								<span class="light fixedFont">{Function}</span>  <b>callbacks.onError(rsp)</b>
+								
+							</dt>
+								<dd>Callback to invoke on update error (refresh or event)
+    as passed by finesse.restservices.RestBase.restRequest()
+    {
+        status: {Number} The HTTP status code returned
+        content: {String} Raw string of response
+        object: {Object} Parsed object of response
+        error: {Object} Wrapped exception that was caught
+        error.errorType: {String} Type of error that was caught
+        error.errorMessage: {String} Message associated with error
+    }</dd>
+						
+							<dt>
+								<span class="light fixedFont">{RestBase}</span>  <b>restObj</b>
+								<i>Optional</i>
+							</dt>
+								<dd>A RestBase parent object which this object has an association with.</dd>
+						
+						</dl>
+					
+					
+					
+					
+					
+					
+					
+
+			</div>
+			
+
+<!-- ============================== field details ========================== -->		
+			
+
+<!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="addHandler"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>addHandler</b>(notifierType, callback, scope)
+					
+					</div>
+					<div class="description">
+						Adds an handler to this object.
+If notifierType is 'load' and the object has already loaded, the callback is invoked immediately
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  // Handler for additions to the Dialogs collection object.  
+  // When Dialog (a RestBase object) is created, add a change handler.
+  _handleDialogAdd = function(dialog) {
+     dialog.addHandler('change', _handleDialogChange);
+  }</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>notifierType</b>
+									
+								</dt>
+								<dd>The type of notifier to add to ('load', 'change', 'add', 'delete', 'error')</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>callback</b>
+									
+								</dt>
+								<dd>The function callback to invoke.</dd>
+							
+								<dt>
+									<b>scope</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getData"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Object}</span>
+					<b>getData</b>()
+					
+					</div>
+					<div class="description">
+						Gets the data for this object.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> which is contained in data</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getId"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{String}</span>
+					<b>getId</b>()
+					
+					</div>
+					<div class="description">
+						Getter for the id of this RestBase
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> The id of this RestBase</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getProperty"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Property Value}</span>
+					<b>getProperty</b>(obj, property)
+					
+					</div>
+					<div class="description">
+						Gets a property from the object.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>obj</b>
+									
+								</dt>
+								<dd>is the object to examine</dd>
+							
+								<dt>
+									<b>property</b>
+									
+								</dt>
+								<dd>is the property to get</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Property Value}</span> or {Null} if not found</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="hasProperty"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>hasProperty</b>(obj, property)
+					
+					</div>
+					<div class="description">
+						Determines if the object has a particular property.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>obj</b>
+									
+								</dt>
+								<dd>is the object to examine</dd>
+							
+								<dt>
+									<b>property</b>
+									
+								</dt>
+								<dd>is the property to check for</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="isLoaded"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/finesse.restservices.RestBase.html">finesse.restservices.RestBase</a>}</span>
+					<b>isLoaded</b>()
+					
+					</div>
+					<div class="description">
+						Utility method gating any operations that require complete instantiation
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Throws:</dt>
+							
+								<dt>
+									 <b></b>
+								</dt>
+								<dd>Error
+    If this object was not fully instantiated yet</dd>
+							
+							</dl>
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/finesse.restservices.RestBase.html">finesse.restservices.RestBase</a>}</span> This RestBase object to allow cascading</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="refresh"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/finesse.restservices.RestBase.html">finesse.restservices.RestBase</a>}</span>
+					<b>refresh</b>(retries)
+					
+					</div>
+					<div class="description">
+						Force an update on this object. Since an asynchronous GET is performed,
+it is necessary to have an onChange handler registered in order to be
+notified when the response of this returns.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Integer}</span> <b>retries</b>
+									
+								</dt>
+								<dd>The number or retry attempts to make.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/finesse.restservices.RestBase.html">finesse.restservices.RestBase</a>}</span> This RestBase object to allow cascading</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="removeHandler"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>removeHandler</b>(notifierType, callback)
+					
+					</div>
+					<div class="description">
+						Removes a handler from this object.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>notifierType</b>
+									
+								</dt>
+								<dd>The type of notifier to remove ('load', 'change', 'add', 'delete', 'error')</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>callback</b>
+									
+								</dt>
+								<dd>The function to remove.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
+			
+			
+<!-- ============================== event details ========================= -->		
+			
+			
+			<hr />
+		</div>
+
+		
+<!-- ============================== footer ================================= -->
+		<div class="fineprint" style="clear:both">
+			
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Tue May 27 2014 20:34:36 GMT-0400 (EDT)
+		</div>
+	</body>
+</html>
